@@ -1,7 +1,7 @@
 import asyncio
 
-from bot import run_bot
-from http_server import run_http
+from bot.bot import run_bot
+from web.http_server import run_http
 
 
 async def main():
