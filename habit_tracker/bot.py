@@ -15,11 +15,11 @@ async def start(message: Message):
     await message.answer("👋 Hello! Use /log to test backend.")
 
 
-async def run_bot():
-    dp.include_router(router)
-    await dp.start_polling(bot)
-
-
 @router.message()
 async def echo(message: Message):
     await message.answer(f"You said: {message.text}")
+
+
+async def run_bot():
+    dp.include_router(router)
+    await dp.start_polling(bot)
