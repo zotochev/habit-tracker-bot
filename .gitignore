@@ -138,3 +138,5 @@ cython_debug/
 Thumbs.db
 /.venv/
 .venv/
+
+*.db

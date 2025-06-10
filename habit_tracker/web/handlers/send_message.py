@@ -2,7 +2,7 @@ from fastapi import Header
 from fastapi import APIRouter
 
 from bot.bot import bot
-from data.model.send_message import SendMessageRequest
+from data.schemas.send_message import SendMessageRequest
 
 
 router = APIRouter()
