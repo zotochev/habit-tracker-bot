@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 
 
@@ -7,9 +7,10 @@ class TelegramAccountBase(BaseModel):
 
 
 class TelegramAccountCreate(TelegramAccountBase):
-    user_id: int
+    name: str
 
 
 class TelegramAccount(TelegramAccountBase):
-    class Config:
-        orm_mode = True
+    user_id: int
+
+    model_config = ConfigDict(from_attributes=True)
