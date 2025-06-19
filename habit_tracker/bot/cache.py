@@ -10,7 +10,7 @@ class UserCache:
     language: str = 'ru'
     state: HabitStates = HabitStates.init
     habit: HabitBuffer = field(default_factory=HabitBuffer)
-    temp_message: Message | None = None
+    temp_message_id: int | None = None
 
 
 class Cache:

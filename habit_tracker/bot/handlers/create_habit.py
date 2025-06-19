@@ -95,7 +95,7 @@ async def habit_description(message: Message, user_cache: UserCache):
     # datetime.strptime(date_str, "%d-%m-%Y")
     user_cache.habit.start_date = message.date.date()
     send_message = await message.answer(message.date.strftime("%d-%m-%Y"), reply_markup=create_date_keyboard())
-    user_cache.temp_message = send_message
+    user_cache.temp_message_id = send_message.message_id
 
 
 @router.callback_query(HabitStateFilter(HabitStates.enter_habit_start_date))
@@ -139,14 +139,24 @@ async def enter_habit_date(message: Message, user_cache: UserCache):
     await message.delete()
 
     try:
-        # new_date = datetime.strptime(message.text, "%d-%m-%Y").date()
         new_date = dateparser.parse(message.text).date()
     except Exception as e:
         print(f"enter_habit_date: {e.__class__.__name__}: {e}")
         return
 
-    if user_cache.temp_message is None:
-        print(f"enter_habit_date: message with date not found: {user_cache.temp_message}")
+    if user_cache.temp_message_id is None:
+        print(f"enter_habit_date: message with date not found: {user_cache.temp_message_id}")
         return
 
-    await user_cache.temp_message.edit_text(new_date.strftime("%d-%m-%Y"))
+    try:
+        from bot import bot_instance
+        await bot_instance.edit_message_text(
+            new_date.strftime("%d-%m-%Y"),
+            message_id=user_cache.temp_message_id,
+            chat_id=message.chat.id,
+            reply_markup=create_date_keyboard(),
+        )
+        user_cache.habit.start_date = new_date
+    except Exception as e:
+        print(f"enter_habit_date: {e.__class__.__name__}: {e}")
+        return
