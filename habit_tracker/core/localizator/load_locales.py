@@ -4,10 +4,7 @@ import yaml
 
 from data.schemas.translations import Translations
 from data.schemas.user import LanguageEnum
-# from core.localizator import Localizator
 from core import localizator
-
-from config import LOCALES_DIRECTORY
 
 
 def load_locales(locales_directory: Path) -> dict[LanguageEnum, Translations]:

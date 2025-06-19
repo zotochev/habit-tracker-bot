@@ -1,6 +1,10 @@
-from pydantic import BaseModel, Field, ConfigDict
+from email.policy import default
+
+from pydantic import BaseModel, Field, ConfigDict, constr
 from datetime import date, datetime
 from typing import Optional, List
+
+from config import MAX_HABIT_NAME, MAX_HABIT_DESCRIPTION
 
 
 class HabitBase(BaseModel):
@@ -35,3 +39,13 @@ class Habit(HabitBase):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class HabitBuffer(BaseModel):
+    name: Optional[constr(strip_whitespace=True, min_length=1, max_length=MAX_HABIT_NAME)] = None
+    description: Optional[constr(strip_whitespace=True, min_length=1, max_length=MAX_HABIT_DESCRIPTION)] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    times_per_day: Optional[int] = Field(default=None, ge=1)
+
+    model_config = ConfigDict(validate_assignment=True)

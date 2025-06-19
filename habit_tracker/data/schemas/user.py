@@ -10,6 +10,13 @@ class LanguageEnum(str, enum.Enum):
     RU = 'ru'
     EN = 'en'
 
+    @classmethod
+    def ALL(cls):
+        return (
+            cls.RU,
+            cls.EN,
+        )
+
 
 class UserBase(BaseModel):
     name: str
