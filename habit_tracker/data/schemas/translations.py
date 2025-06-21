@@ -14,3 +14,8 @@ class Translations(BaseModel):
     wrong_type_habit_description: str = '<WRONG_TYPE_HABIT_DESCRIPTION>'
     habit_description_too_long: str = '<HABIT_DESCRIPTION_TOO_LONG>'
     enter_habit_start_date: str = '<ENTER_HABIT_START_DATE>'
+    menu_add_habit: str = '<MENU_ADD_HABIT>'
+    menu_list_habits: str = '<MENU_LIST_HABITS>'
+    menu_help: str = '<MENU_HELP>'
+    help_message: str = '<HELP_MESSAGE>'
+    unexpected: str = '<unexpected>'

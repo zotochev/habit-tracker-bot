@@ -7,20 +7,27 @@ from .telegram_account import TelegramAccount
 
 
 class LanguageEnum(str, enum.Enum):
-    RU = 'ru'
-    EN = 'en'
+    ru = 'ru'
+    en = 'en'
 
     @classmethod
-    def ALL(cls):
+    def all(cls):
         return (
-            cls.RU,
-            cls.EN,
+            cls.ru,
+            cls.en,
         )
+
+    @classmethod
+    def map(cls):
+        return {
+            cls.ru: "🇷🇺",
+            cls.en: "🇬🇧",
+        }
 
 
 class UserBase(BaseModel):
-    name: str
-    language: LanguageEnum = LanguageEnum.RU
+    name: Optional[str] = None
+    language: LanguageEnum = LanguageEnum.ru
 
 
 class UserCreate(UserBase):
@@ -35,6 +42,7 @@ class UserUpdate(UserBase):
 
 class User(UserBase):
     id: int
-    telegram_account: Optional[TelegramAccount] = None
+    # telegram_id: Optional[TelegramAccount] = None
+    telegram_id: Optional[int] = None
 
     model_config = ConfigDict(from_attributes=True)

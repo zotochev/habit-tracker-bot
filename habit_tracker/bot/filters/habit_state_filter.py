@@ -11,4 +11,4 @@ class HabitStateFilter(BaseFilter):
 
     async def __call__(self, message: Message) -> bool:
         user_cache = cache.cache.user(message.from_user.id)
-        return user_cache.state == self._habit_state
+        return user_cache.state_machine.state == self._habit_state

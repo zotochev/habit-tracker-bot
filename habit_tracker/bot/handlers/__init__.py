@@ -1,10 +1,16 @@
 from aiogram import Router
 
-from .start import router as start_router
-from .create_habit import router as default_router
+from .command_start import router as command_start_router
+from .command_help import router as command_help_router
+from .command_choose_language import router as command_choose_language
+from .message import router as message_router
+from .callback_query import router as callback_query_router
 
 
 router = Router()
 
-router.include_router(start_router)
-router.include_router(default_router)
+router.include_router(command_start_router)
+router.include_router(command_help_router)
+router.include_router(command_choose_language)
+router.include_router(message_router)
+router.include_router(callback_query_router)
