@@ -1,5 +1,5 @@
 from data.services.backend_service.backend_service import BackendService
-from data.schemas import User
+from data.schemas import User, Habit, HabitBuffer
 
 
 class BackendRepository:
@@ -14,3 +14,9 @@ class BackendRepository:
 
     async def update_user_language(self, backend_user_id: int, language: str) -> User | None:
         return await self._service.update_user_language(backend_user_id, language)
+
+    async def get_habit_by_user_id_and_name(self, user_id: int, habit_name: str) -> Habit | None:
+        return await self._service.get_habit_by_user_id_and_name(user_id, habit_name)
+
+    async def create_habit(self, user_id: int, habit_buffer: HabitBuffer) -> Habit | None:
+        return await self._service.create_habit(user_id, habit_buffer)

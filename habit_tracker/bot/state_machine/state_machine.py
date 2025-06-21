@@ -1,16 +1,10 @@
 from __future__ import annotations
-from abc import ABC, abstractmethod
 import logging
 
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import Message, CallbackQuery
 
 from data.factory import get_backend_repository
-from data.repositories.backend_repository.backend_repository import BackendRepository
 from bot.states import HabitStates
-from data.schemas.user import LanguageEnum
-import bot
-from core import localizator
-from bot.menu import setup_menu
 from .istate import IState
 
 from typing import TYPE_CHECKING
@@ -27,7 +21,7 @@ class StateMachine:
         self._user_cache = user_cache
         self._states_factory = states_factory
         self._current_state = self._create(initial_state)
-        self._paused_states = []
+        self._paused_states: list[IState] = []
 
     async def handle(self, message: Message | CallbackQuery) -> None:
         new_state = await self._current_state.handle(message)
@@ -39,6 +33,8 @@ class StateMachine:
         if new_state.state == HabitStates.end:
             if self._paused_states:
                 new_state = self._paused_states.pop()
+                await new_state.on_restore()
+                logger.warning(f"{self.__class__.__name__}: handle: restored {new_state.state}")
             else:
                 new_state = self._create(HabitStates.wait_command)
 
@@ -51,6 +47,8 @@ class StateMachine:
     def set_state(self, state: HabitStates) -> None:
         self._paused_states.append(self._current_state)
         self._current_state = self._create(state)
+        logger.warning(f"{self.__class__.__name__}: set_state: {state}")
 
     def _create(self, state: HabitStates) -> IState:
+        assert state in self._states_factory, f'{self.__class__.__name__}._create({state}) -> state not found in factory'
         return self._states_factory[state](self._repository, self._user_cache, self._states_factory)

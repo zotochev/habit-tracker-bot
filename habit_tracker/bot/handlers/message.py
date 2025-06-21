@@ -31,8 +31,7 @@ def is_command_message(message: Message) -> bool:
 
 @router.message(lambda message: not is_command_message(message))
 async def habit_name(message: Message, user_cache: UserCache):
-    logger.warning(f"MESSAGE: {message.text}")
-    # HabitStateFilter(HabitStates.enter_habit_name)
+    # logger.warning(f"MESSAGE: {message.text}")
     l = localizator.localizator.lang(user_cache.language)
 
     if message.content_type != ContentType.TEXT:

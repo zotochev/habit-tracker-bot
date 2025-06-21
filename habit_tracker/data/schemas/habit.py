@@ -34,8 +34,6 @@ class HabitUpdate(HabitBase):
 
 
 class Habit(HabitBase):
-    id: int
-    user_id: int
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -46,6 +44,6 @@ class HabitBuffer(BaseModel):
     description: Optional[constr(strip_whitespace=True, min_length=1, max_length=MAX_HABIT_DESCRIPTION)] = None
     start_date: Optional[date] = None
     end_date: Optional[date] = None
-    times_per_day: Optional[int] = Field(default=None, ge=1)
+    times_per_day: Optional[int] = Field(default=1, ge=1)
 
     model_config = ConfigDict(validate_assignment=True)

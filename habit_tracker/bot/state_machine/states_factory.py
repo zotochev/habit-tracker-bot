@@ -6,6 +6,8 @@ from bot.state_machine.states import (
     ChooseLanguageCommand,
     WaitCommand,
     EndState,
+    AddHabitCommandState,
+    AddHabitState,
 )
 
 
@@ -17,5 +19,7 @@ STATES_FACTORY = {
         ChooseLanguageCommand,
         WaitCommand,
         EndState,
+        AddHabitCommandState,
+        AddHabitState,
     )
 }

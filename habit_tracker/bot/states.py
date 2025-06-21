@@ -9,8 +9,8 @@ class HabitStates(Enum):
     wait_command = auto()
 
     command_add_habit = auto()
+    add_habit = auto()
 
     # wait_start_enter_habit = auto()
-    # enter_habit_name = auto()
     # enter_habit_description = auto()
     # enter_habit_start_date = auto()

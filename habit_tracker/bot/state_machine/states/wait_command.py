@@ -19,7 +19,10 @@ class WaitCommand(IState):
     state = HabitStates.wait_command
 
     async def _handle_message(self, message: Message) -> IState:
-        await message.delete()
+        try:
+            await message.delete()
+        except Exception as e:
+            logger.warning(f"{self.__class__.__name__}._handle_message: {e.__class__.__name__}: {e}")
         return self
 
     async def _handle_callback_query(self, callback_query: CallbackQuery) -> IState:
@@ -33,22 +36,6 @@ class WaitCommand(IState):
     async def on_enter(self) -> None:
         # Отправить сообщение с кнопкой для создания привычки
         await super().on_enter()
-        # l = localizator.localizator
-        #
-        # await setup_menu(self._user_cache.language, bot.bot_instance)
-        #
-        # await bot.bot_instance.send_message(
-        #     chat_id=self._user_cache.telegram_id,
-        #     text=l.lang(self._user_cache.language).create_habit,
-        #     reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-        #         [
-        #             InlineKeyboardButton(
-        #                 text=l.lang(self._user_cache.language).button_create_habit,
-        #                 callback_data=l.lang(self._user_cache.language).button_create_habit,
-        #             )
-        #         ]
-        #     ])
-        # )
 
     async def on_exit(self) -> None:
         # Удалить сообщение?

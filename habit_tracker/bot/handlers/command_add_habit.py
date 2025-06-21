@@ -10,6 +10,7 @@ router = Router()
 
 
 @router.message(Command(MenuCommands.add_habit))
-async def choose_language_handler(message: Message, user_cache: UserCache):
-    user_cache.state_machine.set_state(HabitStates.add)
+async def add_habit_handler(message: Message, user_cache: UserCache):
+    user_cache.state_machine.set_state(HabitStates.command_add_habit)
+    await message.delete()
     await user_cache.state_machine.handle(message)

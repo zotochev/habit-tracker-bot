@@ -1,4 +1,6 @@
 from dataclasses import dataclass, field
+from datetime import datetime
+
 from bot.states import HabitStates
 from data.schemas import HabitBuffer
 from bot.state_machine.state_machine import StateMachine
@@ -10,10 +12,9 @@ from data.schemas.user import LanguageEnum
 class UserCache:
     telegram_id: int
     language: LanguageEnum | None = None
-    habit: HabitBuffer = field(default_factory=HabitBuffer)
     backend_id: int | None = None
-    temp_message_id: int | None = None
     state_machine: StateMachine | None = None
+    last_datetime: datetime | None = None
 
 
 class Cache:
