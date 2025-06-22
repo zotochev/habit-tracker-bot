@@ -17,6 +17,7 @@ from core import localizator
 from data.schemas import HabitBuffer
 
 from bot.state_machine.istate import IState
+from bot.state_machine.states_factory import register_state
 
 from typing import TYPE_CHECKING
 
@@ -43,8 +44,8 @@ class FieldHandleError(Exception):
     pass
 
 
+@register_state(HabitStates.add_habit)
 class AddHabitState(IState):
-    state = HabitStates.add_habit
     order = (
         HabitField.name,
         HabitField.description,

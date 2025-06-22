@@ -6,6 +6,7 @@ from data.schemas import HabitBuffer
 from bot.state_machine.state_machine import StateMachine
 from bot.state_machine.states_factory import STATES_FACTORY
 from data.schemas.user import LanguageEnum
+from typing import Any
 
 
 @dataclass

@@ -30,3 +30,5 @@ class Translations(BaseModel):
     habit_error_date: str = '<HABIT_ERROR_DATE>'
     habit_error_header: str = '<HABIT_ERROR_HEADER>'
     habit_error_times: str = '<HABIT_ERROR_TIMES>'
+    habit_list_header: str = '<HABIT_LIST_HEADER>'
+    habit_list_no_habits: str = '<HABIT_LIST_NO_HABITS>'

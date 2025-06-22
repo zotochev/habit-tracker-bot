@@ -3,12 +3,12 @@ import logging
 
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 
+from bot.state_machine.states_factory import register_state
 from bot.states import HabitStates
 from data.schemas.user import LanguageEnum
 import bot
 from core import localizator
 from bot.menu import setup_menu
-from bot.state_machine.states_factory import register_state
 
 from bot.state_machine.istate import IState
 
@@ -20,9 +20,8 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-@register_state(HabitStates.end)
-class EndState(IState):
-    # state = HabitStates.end
+@register_state(HabitStates.command_list_habits)
+class ListHabitsCommandState(IState):
 
     async def _handle_message(self, message: Message) -> IState:
         return await self._handle()
@@ -31,4 +30,4 @@ class EndState(IState):
         return await self._handle()
 
     async def _handle(self):
-        return self
+        return self._create(HabitStates.list_habits)

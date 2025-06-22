@@ -39,6 +39,11 @@ class Habit(HabitBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class HabitProgress(HabitUpdate):
+    user_id: Optional[int] = None
+    times_did: Optional[int] = None
+
+
 class HabitBuffer(BaseModel):
     name: Optional[constr(strip_whitespace=True, min_length=1, max_length=MAX_HABIT_NAME)] = None
     description: Optional[constr(strip_whitespace=True, min_length=1, max_length=MAX_HABIT_DESCRIPTION)] = None

@@ -1,7 +1,11 @@
+from datetime import date
+
 from fastapi.encoders import jsonable_encoder
 
 from core.requester import Requester, Response
-from data.schemas import UserUpdate, User, TelegramAccount, Habit, HabitBuffer, HabitCreate
+from data.schemas import UserUpdate, User, TelegramAccount, Habit, HabitBuffer, HabitCreate, HabitEventCreate, \
+    HabitEvent
+from data.schemas.habit import HabitProgress
 
 
 class BackendService:
@@ -54,3 +58,22 @@ class BackendService:
             return
 
         return Habit(**r.body)
+
+    async def get_habits_for_date(self, user_id: int, habit_date: date) -> list[HabitProgress] | None:
+        r: Response = await self._requester.get(
+            "v1/habits/event/progress",
+            query=jsonable_encoder({'user_id': user_id, 'habit_date': habit_date}),
+        )
+
+        if not r.ok():
+            return
+
+        return [HabitProgress(**h) for h in r.body]
+
+    async def send_habit_event(self, habit_id: int, timestamp: date) -> HabitEvent | None:
+        r: Response = await self._requester.post(f"v1/habits/{habit_id}/event", body=jsonable_encoder({'timestamp': timestamp}))
+
+        if not r.ok():
+            return
+
+        return HabitEvent(**r.body)

@@ -3,6 +3,7 @@ import logging
 
 from aiogram.types import Message, CallbackQuery
 
+from bot.state_machine.states_factory import register_state
 from bot.states import HabitStates
 
 from bot.state_machine.istate import IState
@@ -15,8 +16,8 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
+@register_state(HabitStates.wait_command)
 class WaitCommand(IState):
-    state = HabitStates.wait_command
 
     async def _handle_message(self, message: Message) -> IState:
         try:
@@ -32,11 +33,3 @@ class WaitCommand(IState):
 
     async def _handle(self, message_text: str) -> IState:
         return self
-
-    async def on_enter(self) -> None:
-        # Отправить сообщение с кнопкой для создания привычки
-        await super().on_enter()
-
-    async def on_exit(self) -> None:
-        # Удалить сообщение?
-        await super().on_exit()

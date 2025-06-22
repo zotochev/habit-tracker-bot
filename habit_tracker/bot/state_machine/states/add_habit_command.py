@@ -8,6 +8,7 @@ from data.schemas.user import LanguageEnum
 import bot
 from core import localizator
 from bot.menu import setup_menu
+from bot.state_machine.states_factory import register_state
 
 from bot.state_machine.istate import IState
 
@@ -19,8 +20,8 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
+@register_state(HabitStates.command_add_habit)
 class AddHabitCommandState(IState):
-    state = HabitStates.command_add_habit
 
     async def _handle_message(self, message: Message) -> IState:
         return await self._handle()

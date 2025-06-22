@@ -1,5 +1,7 @@
+from datetime import date
+
 from data.services.backend_service.backend_service import BackendService
-from data.schemas import User, Habit, HabitBuffer
+from data.schemas import User, Habit, HabitBuffer, HabitEvent
 
 
 class BackendRepository:
@@ -20,3 +22,9 @@ class BackendRepository:
 
     async def create_habit(self, user_id: int, habit_buffer: HabitBuffer) -> Habit | None:
         return await self._service.create_habit(user_id, habit_buffer)
+
+    async def get_habits_for_date(self, user_id: int, habit_date: date) -> Habit | None:
+        return await self._service.get_habits_for_date(user_id, habit_date)
+
+    async def send_habit_event(self, habit_id: int, timestamp: date) -> HabitEvent:
+        return await self._service.send_habit_event(habit_id, timestamp)
