@@ -20,8 +20,8 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-@register_state(HabitStates.command_list_habits)
-class ListHabitsCommandState(IState):
+@register_state(HabitStates.command_todays_habits)
+class TodaysHabitsCommandState(IState):
 
     async def _handle_message(self, message: Message) -> IState:
         return await self._handle()
@@ -30,4 +30,4 @@ class ListHabitsCommandState(IState):
         return await self._handle()
 
     async def _handle(self):
-        return self._create(HabitStates.list_habits)
+        return self._create(HabitStates.todays_habits)

@@ -10,5 +10,5 @@ class HabitStates(Enum):
 
     command_add_habit = auto()
     add_habit = auto()
-    command_list_habits = auto()
-    list_habits = auto()
+    command_todays_habits = auto()
+    todays_habits = auto()

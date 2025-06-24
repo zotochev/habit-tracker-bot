@@ -23,8 +23,8 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-@register_state(HabitStates.list_habits)
-class ListHabitsState(IState):
+@register_state(HabitStates.todays_habits)
+class TodaysHabitsState(IState):
     HABITS_PER_PAGE = 10
     SCROLL_LEFT = '<'
     SCROLL_RIGHT = '>'
