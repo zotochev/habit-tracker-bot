@@ -9,7 +9,7 @@ from bot.states import HabitStates
 router = Router()
 
 
-@router.message(Command(MenuCommands.list_habits))
+@router.message(Command(MenuCommands.todays_habits))
 async def list_habit_handler(message: Message, user_cache: UserCache):
     if user_cache.state_machine.state not in (HabitStates.command_list_habits, HabitStates.list_habits):
         user_cache.state_machine.set_state(HabitStates.command_list_habits)

@@ -59,10 +59,10 @@ class BackendService:
 
         return Habit(**r.body)
 
-    async def get_habits_for_date(self, user_id: int, habit_date: date) -> list[HabitProgress] | None:
+    async def get_habits_for_date(self, user_id: int, habit_date: date, unfinished_only: bool = False) -> list[HabitProgress] | None:
         r: Response = await self._requester.get(
             "v1/habits/event/progress",
-            query=jsonable_encoder({'user_id': user_id, 'habit_date': habit_date}),
+            query=jsonable_encoder({'user_id': user_id, 'habit_date': habit_date, 'unfinished_only': int(unfinished_only)}),
         )
 
         if not r.ok():

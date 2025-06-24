@@ -9,6 +9,7 @@ from data.schemas.user import LanguageEnum
 import bot
 from core import localizator
 from bot.menu import setup_menu
+from config import MONTHS
 
 from bot.state_machine.istate import IState
 
@@ -44,6 +45,9 @@ class ListHabitsState(IState):
         return await self._handle()
 
     async def _handle_callback_query(self, callback_query: CallbackQuery) -> IState:
+        kw = {}
+        l = localizator.localizator.lang(self._user_cache.language)
+
         if callback_query.data == self.SCROLL_RIGHT:
             if self._page_current == self._pages_total:
                 self._page_current = 1
@@ -57,12 +61,20 @@ class ListHabitsState(IState):
         if callback_query.data.startswith('habit'):
             _, habit_id = callback_query.data.split('_')
             await self._backend_repository.send_habit_event(int(habit_id), self._user_cache.last_datetime.date())
-        await callback_query.answer()
+            if self.__is_habit_completed(int(habit_id)):
+                kw = {'text': l.habit_list_congrats, 'show_alert': False}
+        await callback_query.answer(**kw)
 
         result = await self._handle()
         text = self.__format_habits_message()
         await self.__edit_habits_message(text)
         return result
+
+    def __is_habit_completed(self, habit_id: int) -> bool:
+        for habit in self._habits:
+            if habit.id == habit_id:
+                return habit.times_did + 1 == habit.times_per_day
+        return False
 
     async def _handle(self):
         await self.__update()
@@ -84,7 +96,9 @@ class ListHabitsState(IState):
         l = localizator.localizator.lang(self._user_cache.language)
 
         text = ''
-        text += f'{l.habit_list_header} [{self._page_current}/{self._pages_total}]'
+        text += f'📅 {l.habit_list_header} — {MONTHS[self._user_cache.language][self._user_cache.last_datetime.month]} {self._user_cache.last_datetime.day}\n'
+        text += f'{l.habit_list_tagline}\n'
+        text += f'{l.habit_list_page}: [{self._page_current}/{self._pages_total}]\n'
         text += '\n'
         text += '\n'
 
@@ -111,7 +125,6 @@ class ListHabitsState(IState):
             try:
                 if self._list_message.text != message:
                     await self._list_message.edit_text(
-                        # chat_id=self._user_cache.telegram_id,
                         text=message,
                         reply_markup=self.__construct_keyboard(),
                     )
@@ -120,7 +133,9 @@ class ListHabitsState(IState):
                 await self.__send_habits_message(message)
 
     async def __update(self) -> None:
-        habits = await self._backend_repository.get_habits_for_date(self._user_cache.backend_id, self._user_cache.last_datetime.date())
+        habits = await self._backend_repository.get_habits_for_date(
+            self._user_cache.backend_id, self._user_cache.last_datetime.date(), unfinished_only=True
+        )
         self._habits = habits or []
         number_of_habits = len(self._habits)
 
@@ -140,11 +155,7 @@ class ListHabitsState(IState):
             keyboard.inline_keyboard.append(
                 [
                     InlineKeyboardButton(
-                        text=f'{habit.name}',
-                        callback_data=f'habit_{habit.id}',
-                    ),
-                    InlineKeyboardButton(
-                        text=f'{habit.times_did}/{habit.times_per_day}',
+                        text=f'{habit.name} {habit.times_did}/{habit.times_per_day}',
                         callback_data=f'habit_{habit.id}',
                     ),
                 ]
