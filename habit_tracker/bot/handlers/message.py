@@ -4,7 +4,6 @@ from aiogram.types import (
     ContentType,
 )
 
-from bot.state_machine.states.wait_command import logger
 from bot.cache import UserCache
 from core import localizator
 
@@ -24,14 +23,11 @@ def is_command_message(message: Message) -> bool:
     if message.text is None:
         return False
     entities = message.entities or []
-    # any(e.type == "bot_command" for e in message.entities)
-    #  and e.offset == 0
     return any(e.type == "bot_command" for e in entities)
 
 
 @router.message(lambda message: not is_command_message(message))
 async def habit_name(message: Message, user_cache: UserCache):
-    # logger.warning(f"MESSAGE: {message.text}")
     l = localizator.localizator.lang(user_cache.language)
 
     if message.content_type != ContentType.TEXT:
