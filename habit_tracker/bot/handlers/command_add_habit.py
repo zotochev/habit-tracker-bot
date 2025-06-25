@@ -14,4 +14,3 @@ async def add_habit_handler(message: Message, user_cache: UserCache):
     if user_cache.state_machine.state != HabitStates.add_habit:
         await user_cache.state_machine.set_state(HabitStates.add_habit)
     await message.delete()
-    # await user_cache.state_machine.handle(message)

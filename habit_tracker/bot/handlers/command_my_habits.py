@@ -14,4 +14,3 @@ async def my_habits_handler(message: Message, user_cache: UserCache):
     if user_cache.state_machine.state not in (HabitStates.my_habits,):
         await user_cache.state_machine.set_state(HabitStates.my_habits)
         await message.delete()
-    # await user_cache.state_machine.handle(message)
