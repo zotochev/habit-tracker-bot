@@ -10,8 +10,8 @@ router = Router()
 
 
 @router.message(Command(MenuCommands.todays_habits))
-async def list_habit_handler(message: Message, user_cache: UserCache):
+async def todays_habit_handler(message: Message, user_cache: UserCache):
     if user_cache.state_machine.state not in (HabitStates.command_todays_habits, HabitStates.todays_habits):
-        user_cache.state_machine.set_state(HabitStates.command_todays_habits)
+        await user_cache.state_machine.set_state(HabitStates.todays_habits)
         await message.delete()
-    await user_cache.state_machine.handle(message)
+    # await user_cache.state_machine.handle(message)

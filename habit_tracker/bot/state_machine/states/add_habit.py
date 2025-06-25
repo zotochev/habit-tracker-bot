@@ -9,14 +9,13 @@ from pydantic import ValidationError
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 import dateparser
 
-from bot import bot_instance
-from bot.menu import setup_menu
 from bot.states import HabitStates
 import bot
 from core import localizator
 from data.schemas import HabitBuffer
 
 from bot.state_machine.istate import IState
+from bot.state_machine.isuspendable_state import ISuspendableState
 from bot.state_machine.states_factory import register_state
 
 from typing import TYPE_CHECKING
@@ -45,7 +44,7 @@ class FieldHandleError(Exception):
 
 
 @register_state(HabitStates.add_habit)
-class AddHabitState(IState):
+class AddHabitState(IState, ISuspendableState):
     order = (
         HabitField.name,
         HabitField.description,
@@ -99,15 +98,15 @@ class AddHabitState(IState):
 
     async def _handle_callback_query(self, callback_query: CallbackQuery) -> IState:
         if callback_query.data == HABIT_BUTTON_SUBMIT:
+            l = localizator.localizator.lang(self._user_cache.language)
             await self._backend_repository.create_habit(self._user_cache.backend_id, self._habit)
-            await callback_query.answer()
+            await callback_query.answer(l.habit_created)
             await callback_query.message.delete()
             return self._create(HabitStates.end)
         elif self._current_field != HabitField(callback_query.data):
             self._current_field = HabitField(callback_query.data)
             await self.__update_habit_message()
-
-        await callback_query.answer()
+            await callback_query.answer()
         return self
 
     async def _handle(self):
@@ -135,6 +134,14 @@ class AddHabitState(IState):
     async def on_restore(self) -> None:
         await super().on_restore()
         await self.__update_habit_message()
+
+    async def on_suspend(self) -> None:
+        await super().on_suspend()
+        if self._habit_message is not None:
+            try:
+                await self._habit_message.delete()
+            except Exception as e:
+                logger.warning(f"{self.__class__.__name__}.on_suspend: {e.__class__.__name__}: {e}")
 
     def _is_habit_ready(self):
         return self._habit.name is not None
@@ -171,17 +178,16 @@ class AddHabitState(IState):
     async def __update_habit_message(self):
         self.__update_start_habit_time()
         text, reply_markup = self.__create_habit_message()
+        send_new = self._habit_message is None
+
         try:
             if self._habit_message is not None:
                 await self._habit_message.edit_text(text, reply_markup=reply_markup)
-            else:
-                self._habit_message = await bot.bot_instance.send_message(
-                    chat_id=self._user_cache.telegram_id,
-                    text=text,
-                    reply_markup=reply_markup,
-                )
         except Exception as e:
             logger.warning(f"{self.__class__.__name__}._handle_callback_query {e.__class__.__name__}: {e}")
+            send_new = True
+
+        if send_new:
             self._habit_message = await bot.bot_instance.send_message(
                 chat_id=self._user_cache.telegram_id,
                 text=text,

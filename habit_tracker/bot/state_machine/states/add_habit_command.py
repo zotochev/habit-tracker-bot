@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-@register_state(HabitStates.command_add_habit)
+# @register_state(HabitStates.command_add_habit)
 class AddHabitCommandState(IState):
 
     async def _handle_message(self, message: Message) -> IState:

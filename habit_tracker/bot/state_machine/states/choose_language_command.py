@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-@register_state(HabitStates.command_choose_language)
+# @register_state(HabitStates.command_choose_language)
 class ChooseLanguageCommand(IState):
 
     async def _handle_message(self, message: Message) -> IState:

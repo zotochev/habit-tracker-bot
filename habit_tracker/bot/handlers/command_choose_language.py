@@ -11,5 +11,7 @@ router = Router()
 
 @router.message(Command(MenuCommands.choose_langauge))
 async def choose_language_handler(message: Message, user_cache: UserCache):
-    user_cache.state_machine.set_state(HabitStates.command_choose_language)
-    await user_cache.state_machine.handle(message)
+    if user_cache.state_machine.state != HabitStates.choose_language:
+        await user_cache.state_machine.set_state(HabitStates.choose_language)
+    await message.delete()
+    # await user_cache.state_machine.handle(message)

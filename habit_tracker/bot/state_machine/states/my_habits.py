@@ -2,48 +2,42 @@ from __future__ import annotations
 import logging
 
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from sqlalchemy.util import await_only
 
 from bot.state_machine.states_factory import register_state
 from bot.states import HabitStates
+from data.schemas.user import LanguageEnum
+import bot
 from core import localizator
+from bot.menu import setup_menu
 from config import MONTHS
 
+from bot.state_machine.istate import IState
 from .abstract_habits_list_state import AbstractHabitsListState
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    pass
+    from bot.cache import UserCache
+    from data.repositories.backend_repository.backend_repository import BackendRepository
 
 
 logger = logging.getLogger(__name__)
 
 
-@register_state(HabitStates.todays_habits)
-class TodaysHabitsState(AbstractHabitsListState):
-
+@register_state(HabitStates.my_habits)
+class MyHabitsState(AbstractHabitsListState):
     async def _process_habit_button_callback(self, callback_query: CallbackQuery) -> None:
-        l = localizator.localizator.lang(self._user_cache.language)
-        kw = {}
-
-        _, habit_id = callback_query.data.split('_')
-        await self._backend_repository.send_habit_event(int(habit_id), self._user_cache.last_datetime.date())
-        if self.__is_habit_completed(int(habit_id)):
-            kw = {'text': l.habit_list_congrats, 'show_alert': False}
-        await callback_query.answer(**kw)
-
-    def __is_habit_completed(self, habit_id: int) -> bool:
-        for habit in self._habits:
-            if habit.id == habit_id:
-                return habit.times_did + 1 == habit.times_per_day
-        return False
+        # Перейти в режим редактирования привычки
+        await callback_query.answer("Пока ничего")
+        # return self._create(HabitStates.edit_habit)
 
     def _format_habits_message(self) -> str:
         l = localizator.localizator.lang(self._user_cache.language)
 
         text = ''
-        text += f'📅 {l.habit_list_header} — {MONTHS[self._user_cache.language][self._user_cache.last_datetime.month]} {self._user_cache.last_datetime.day}\n'
-        text += f'{l.habit_list_tagline}\n'
+        text += f'📋 {l.my_habits_header}\n'
+        text += f'{l.my_habits_tagline}\n'
         text += f'{l.habit_list_page}: [{self._page_current}/{self._pages_total}]\n'
         text += '\n'
         text += '\n'
@@ -55,7 +49,7 @@ class TodaysHabitsState(AbstractHabitsListState):
 
     async def _retrieve_habits(self):
         return await self._backend_repository.get_habits_for_date(
-            self._user_cache.backend_id, self._user_cache.last_datetime.date(), unfinished_only=True
+            self._user_cache.backend_id, self._user_cache.last_datetime.date(), unfinished_only=False,
         )
 
     def _construct_keyboard(self):
@@ -68,7 +62,7 @@ class TodaysHabitsState(AbstractHabitsListState):
             keyboard.inline_keyboard.append(
                 [
                     InlineKeyboardButton(
-                        text=f'{habit.name} {habit.times_did}/{habit.times_per_day}',
+                        text=f'{habit.name}',
                         callback_data=f'habit_{habit.id}',
                     ),
                 ]

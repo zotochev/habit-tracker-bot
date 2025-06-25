@@ -34,7 +34,7 @@ class IState(ABC):
 
     async def handle(self, message: Message | CallbackQuery) -> IState:
         if isinstance(message, Message):
-            logger.warning(f"{self.__class__.__name__}: handle: {message.text}")
+            logger.warning(f"{self.__class__.__name__}: handle: {message.text[:message.text.find('\n')]}")
             new_state = await self._handle_message(message)
         elif isinstance(message, CallbackQuery):
             logger.warning(f"{self.__class__.__name__}: handle: {message.message.text}")
@@ -49,10 +49,6 @@ class IState(ABC):
 
     async def on_exit(self) -> None:
         logger.warning(f"{self.__class__.__name__}: on_exit")
-
-    async def on_restore(self) -> None:
-        logger.warning(f"{self.__class__.__name__}: on_restore")
-        pass
 
     @abstractmethod
     async def _handle_message(self, message: Message) -> IState:

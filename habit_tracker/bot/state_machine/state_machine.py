@@ -6,6 +6,7 @@ from aiogram.types import Message, CallbackQuery
 from data.factory import get_backend_repository
 from bot.states import HabitStates
 from .istate import IState
+from .isuspendable_state import ISuspendableState
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -21,7 +22,7 @@ class StateMachine:
         self._user_cache = user_cache
         self._states_factory = states_factory
         self._current_state = self._create(initial_state)
-        self._paused_states: list[IState] = []
+        self._suspended_states: list[ISuspendableState] = []
 
     async def handle(self, message: Message | CallbackQuery) -> None:
         new_state = await self._current_state.handle(message)
@@ -31,8 +32,8 @@ class StateMachine:
             await new_state.on_enter()
 
         if new_state.state == HabitStates.end:
-            if self._paused_states:
-                new_state = self._paused_states.pop()
+            if self._suspended_states:
+                new_state = self._suspended_states.pop()
                 await new_state.on_restore()
                 logger.warning(f"{self.__class__.__name__}: handle: restored {new_state.state}")
             else:
@@ -44,9 +45,28 @@ class StateMachine:
     def state(self):
         return self._current_state.state
 
-    def set_state(self, state: HabitStates) -> None:
-        self._paused_states.append(self._current_state)
-        self._current_state = self._create(state)
+    async def set_state(self, state: HabitStates) -> None:
+        if self._current_state.state == state:
+            return
+
+        if isinstance(self._current_state, ISuspendableState):
+            logger.warning(f"{self.__class__.__name__}: set_state: {self._current_state} set on pause. Len of paused states: {len(self._suspended_states)}")
+            self._suspended_states.append(self._current_state)
+            await self._current_state.on_suspend()
+            self._current_state = None
+
+        paused_matched_states = [s for s in self._suspended_states if s.state == state]
+        assert len(paused_matched_states) in (0, 1), f"To many pause states: {paused_matched_states}"
+
+        if paused_matched_states:
+            self._current_state = paused_matched_states[0]
+            await self._current_state.on_restore()
+        else:
+            if self._current_state:
+                await self._current_state.on_exit()
+            self._current_state = self._create(state)
+            await self._current_state.on_enter()
+
         logger.warning(f"{self.__class__.__name__}: set_state: {state}")
 
     def _create(self, state: HabitStates) -> IState:

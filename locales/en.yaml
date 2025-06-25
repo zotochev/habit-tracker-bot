@@ -12,6 +12,7 @@ habit_description_too_long: "Please keep the habit name short—1 to 2 words wor
 enter_habit_start_date: "Habit start"
 menu_add_habit: 'Add habit'
 menu_list_habits: "Today's habits"
+menu_my_habits: "My Habits"
 menu_help: 'About the bot'
 help_message: 'Here we will describe how to use habit tracker'
 unexpected: 'Unexpected input'
@@ -26,8 +27,11 @@ habit_error_name_already_in_use: 'Name already in use'
 habit_error_date: 'Incorrect date format'
 habit_error_header: 'Error'
 habit_error_times: 'Wrong data for integer number'
+habit_created: 'Habit Created! 🎉'
 habit_list_header: "Todays' Habits"
 habit_list_tagline: 'Mark completed habits or keep working on them'
 habit_list_no_habits: 'You have no habits'
 habit_list_page: 'Page'
 habit_list_congrats: '🎉 Great job! You’ve just completed this habit for today! Keep up the good work 💪'
+my_habits_header: 'My Habits'
+my_habits_tagline: 'Here you can view, edit, or remove your habits — keep your routine up to date.'
