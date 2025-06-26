@@ -40,3 +40,6 @@ class Translations(BaseModel):
     my_habits_header: str = '<MY_HABITS_HEADER>'
     my_habits_tagline: str = '<MY_HABITS_TAGLINE>'
     my_habits_no_habits: str = '<MY_HABITS_NO_HABITS>'
+    habit_edit_updated: str = '<HABIT_EDIT_UPDATED>'
+    habit_edit_header: str = '<HABIT_EDIT_HEADER>'
+    habit_edit_button_submit: str = '<HABIT_EDIT_BUTTON_SUBMIT>'

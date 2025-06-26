@@ -66,7 +66,7 @@ class AbstractHabitState(IState, ISuspendableState):
             start_date=last_date
         )
         self._fields_handlers = {
-            HabitField.name: self.__handle_name,
+            HabitField.name: self._handle_name,
             HabitField.start_date: self.__handle_date,
             HabitField.end_date: self.__handle_date,
             HabitField.times_per_day: self.__handle_times_per_day
@@ -104,6 +104,8 @@ class AbstractHabitState(IState, ISuspendableState):
             self._current_field = HabitField(callback_query.data)
             await self.__update_habit_message()
             await callback_query.answer()
+        else:
+            await callback_query.answer()
         return self
 
     # abstract
@@ -124,12 +126,6 @@ class AbstractHabitState(IState, ISuspendableState):
         end: {}
         """
         await super().on_enter()
-
-        self._habit_message: Message | None = None
-
-        self._current_field = HabitField.name
-        self._habit = HabitBuffer()
-
         await self.__update_habit_message()
 
     async def on_restore(self) -> None:
@@ -156,7 +152,7 @@ class AbstractHabitState(IState, ISuspendableState):
         if self._current_field != self.order[-1]:
             self._current_field = self.order[self.order.index(self._current_field) + 1]
 
-    async def __handle_name(self, habit_name: str) -> str:
+    async def _handle_name(self, habit_name: str) -> str:
         habit = await self._backend_repository.get_habit_by_user_id_and_name(self._user_cache.backend_id, habit_name)
         if habit is not None:
             l = localizator.localizator
@@ -209,6 +205,9 @@ class AbstractHabitState(IState, ISuspendableState):
             return
         self._habit.start_date = self._user_cache.last_datetime.date()
 
+    def _get_submit_button_text(self) -> str:
+        raise NotImplementedError
+
     def __create_habit_message(self):
         l = localizator.localizator
         translations = {
@@ -218,7 +217,7 @@ class AbstractHabitState(IState, ISuspendableState):
             HabitField.start_date: l.lang(self._user_cache.language).habit_field_start_date,
             HabitField.end_date: l.lang(self._user_cache.language).habit_field_end_date,
 
-            HABIT_BUTTON_SUBMIT: l.lang(self._user_cache.language).habit_button_submit
+            HABIT_BUTTON_SUBMIT: self._get_submit_button_text(),
         }
 
         text = self._get_message_header()

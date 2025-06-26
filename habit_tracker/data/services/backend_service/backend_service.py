@@ -4,7 +4,7 @@ from fastapi.encoders import jsonable_encoder
 
 from core.requester import Requester, Response
 from data.schemas import UserUpdate, User, TelegramAccount, Habit, HabitBuffer, HabitCreate, HabitEventCreate, \
-    HabitEvent
+    HabitEvent, HabitUpdate
 from data.schemas.habit import HabitProgress
 
 
@@ -77,3 +77,19 @@ class BackendService:
             return
 
         return HabitEvent(**r.body)
+
+    async def get_habit_by_user_id_and_id(self, user_id: int, habit_id: int) -> HabitUpdate | None:
+        r: Response = await self._requester.get(f"v1/habits/{habit_id}", query={'user_id': user_id})
+
+        if not r.ok():
+            return
+
+        return HabitUpdate(**r.body)
+
+    async def update_habit(self, habit: HabitUpdate) -> HabitUpdate | None:
+        r: Response = await self._requester.patch(f"v1/habits/", body=jsonable_encoder(habit.model_dump()))
+
+        if not r.ok():
+            return
+
+        return HabitUpdate(**r.body)
