@@ -1,12 +1,10 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 
 from bot.states import HabitStates
-from data.schemas import HabitBuffer
 from bot.state_machine.state_machine import StateMachine
 from bot.state_machine.states_factory import STATES_FACTORY
 from data.schemas.user import LanguageEnum
-from typing import Any
 
 
 @dataclass

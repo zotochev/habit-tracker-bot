@@ -27,10 +27,16 @@ logger = logging.getLogger(__name__)
 
 @register_state(HabitStates.my_habits)
 class MyHabitsState(AbstractHabitsListState):
-    async def _process_habit_button_callback(self, callback_query: CallbackQuery) -> None:
-        # Перейти в режим редактирования привычки
-        await callback_query.answer("Пока ничего")
-        # return self._create(HabitStates.edit_habit)
+    async def _handle_callback_query(self, callback_query: CallbackQuery) -> IState:
+        await callback_query.answer()
+
+        if callback_query.data in (self.SCROLL_LEFT, self.SCROLL_RIGHT):
+            self._handel_pages(callback_query.data)
+        elif callback_query.data.startswith('habit'):
+            _, habit_id = callback_query.data.split('_')
+            return self._create(HabitStates.edit_habit, habit_id=int(habit_id))
+
+        return await self._handle()
 
     def _format_habits_message(self) -> str:
         l = localizator.localizator.lang(self._user_cache.language)

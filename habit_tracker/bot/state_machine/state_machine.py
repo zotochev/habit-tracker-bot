@@ -70,5 +70,5 @@ class StateMachine:
         logger.warning(f"{self.__class__.__name__}: set_state: {state}")
 
     def _create(self, state: HabitStates) -> IState:
-        assert state in self._states_factory, f'{self.__class__.__name__}._create({state}) -> state not found in factory'
+        assert state in self._states_factory, f'{self.__class__.__name__}._create({state}) -> state not found in factory {self._states_factory}'
         return self._states_factory[state](self._repository, self._user_cache, self._states_factory)

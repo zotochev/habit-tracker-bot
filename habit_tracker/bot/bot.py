@@ -3,6 +3,7 @@ from aiogram import Bot, Dispatcher
 import config
 
 from .handlers import router
+from . import state_machine  # state-machine initialization
 from . import middlewares
 import bot as bot_module
 

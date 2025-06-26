@@ -58,6 +58,6 @@ class IState(ABC):
     async def _handle_callback_query(self, callback_query: CallbackQuery) -> IState:
         pass
 
-    def _create(self, state: HabitStates) -> IState:
+    def _create(self, state: HabitStates, **kwargs) -> IState:
         assert state in self._state_factory, f'{self.__class__.__name__}._create({state}) -> state not found in factory'
-        return self._state_factory[state](self._backend_repository, self._user_cache, self._state_factory)
+        return self._state_factory[state](self._backend_repository, self._user_cache, self._state_factory, **kwargs)
