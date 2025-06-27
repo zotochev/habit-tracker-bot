@@ -7,7 +7,6 @@ from bot.states import HabitStates
 from data.schemas.user import LanguageEnum
 import bot
 from core import localizator
-from bot.menu import setup_menu
 from bot.state_machine.states_factory import register_state
 
 from bot.state_machine.istate import IState

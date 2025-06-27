@@ -16,7 +16,6 @@ from data.schemas import HabitBuffer
 
 from bot.state_machine.istate import IState
 from bot.state_machine.isuspendable_state import ISuspendableState
-from bot.state_machine.states_factory import register_state
 
 from typing import TYPE_CHECKING
 

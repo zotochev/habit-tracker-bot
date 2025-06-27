@@ -1,12 +1,10 @@
 from __future__ import annotations
 import logging
 
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import Message, CallbackQuery
 
 from bot.states import HabitStates
 import bot
-from core import localizator
-from config import MONTHS
 
 from bot.state_machine.istate import IState
 
@@ -76,14 +74,6 @@ class AbstractHabitsListState(IState):
     # abstract
     async def _process_habit_button_callback(self, callback_query: CallbackQuery) -> None:
         raise NotImplementedError
-        # l = localizator.localizator.lang(self._user_cache.language)
-        # kw = {}
-        #
-        # _, habit_id = callback_query.data.split('_')
-        # await self._backend_repository.send_habit_event(int(habit_id), self._user_cache.last_datetime.date())
-        # if self.__is_habit_completed(int(habit_id)):
-        #     kw = {'text': l.habit_list_congrats, 'show_alert': False}
-        # await callback_query.answer(**kw)
 
     def __is_habit_completed(self, habit_id: int) -> bool:
         for habit in self._habits:
@@ -109,19 +99,6 @@ class AbstractHabitsListState(IState):
 
     def _format_habits_message(self) -> str:
         raise NotImplementedError
-        # l = localizator.localizator.lang(self._user_cache.language)
-        #
-        # text = ''
-        # text += f'📅 {l.habit_list_header} — {MONTHS[self._user_cache.language][self._user_cache.last_datetime.month]} {self._user_cache.last_datetime.day}\n'
-        # text += f'{l.habit_list_tagline}\n'
-        # text += f'{l.habit_list_page}: [{self._page_current}/{self._pages_total}]\n'
-        # text += '\n'
-        # text += '\n'
-        #
-        # if not self._habits:
-        #     text = f'\n{l.habit_list_no_habits}'
-        #     return text
-        # return text
 
     async def __send_habits_message(self, message: str) -> None:
         logger.warning(f"__send_habits_message: SENDING MESSAGE")

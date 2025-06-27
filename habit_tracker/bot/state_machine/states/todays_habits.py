@@ -1,7 +1,7 @@
 from __future__ import annotations
 import logging
 
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.state_machine.states_factory import register_state
 from bot.states import HabitStates
@@ -9,11 +9,6 @@ from core import localizator
 from config import MONTHS
 
 from .abstract_habits_list_state import AbstractHabitsListState
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    pass
 
 
 logger = logging.getLogger(__name__)

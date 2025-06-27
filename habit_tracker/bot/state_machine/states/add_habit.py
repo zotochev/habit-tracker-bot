@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import CallbackQuery
 
 from bot.states import HabitStates
 from core import localizator

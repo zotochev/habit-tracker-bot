@@ -1,12 +1,10 @@
 from __future__ import annotations
 import logging
 
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import Message, CallbackQuery
 
 from bot.states import HabitStates
-from data.schemas.user import LanguageEnum
 import bot
-from core import localizator
 from bot.menu import setup_menu
 
 from bot.state_machine.istate import IState

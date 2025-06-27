@@ -7,6 +7,7 @@ class HabitStates(Enum):
     command_choose_language = auto()
     choose_language = auto()
     wait_command = auto()
+    progress = auto()
 
     command_add_habit = auto()
     add_habit = auto()

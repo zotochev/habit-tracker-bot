@@ -1,25 +1,14 @@
 from __future__ import annotations
 import logging
 
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
-from sqlalchemy.util import await_only
+from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.state_machine.states_factory import register_state
 from bot.states import HabitStates
-from data.schemas.user import LanguageEnum
-import bot
 from core import localizator
-from bot.menu import setup_menu
-from config import MONTHS
 
 from bot.state_machine.istate import IState
 from .abstract_habits_list_state import AbstractHabitsListState
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from bot.cache import UserCache
-    from data.repositories.backend_repository.backend_repository import BackendRepository
 
 
 logger = logging.getLogger(__name__)
