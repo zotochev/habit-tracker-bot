@@ -1,5 +1,4 @@
 start: "Hi I am your habit tracker."
-choose_language: "Please choose your bot language"
 language_chosen: "You chose english as ui language."
 create_habit: "Now it is time to create a habit."
 button_create_habit: "New habit"
@@ -10,10 +9,12 @@ enter_habit_description: "Enter a description for the habit."
 wrong_type_habit_description: "This does not suit as a habit description"
 habit_description_too_long: "Please keep the habit name short—1 to 2 words works best so it’s easy to track and recognize."
 enter_habit_start_date: "Habit start"
-menu_add_habit: 'Add habit'
-menu_list_habits: "Today's habits"
-menu_my_habits: "My Habits"
-menu_help: 'About the bot'
+menu_add_habit: '➕ Add habit'
+menu_list_habits: "✅ Today's habits"
+menu_my_habits: "📋 My Habits"
+menu_choose_language: "🌍 Choose Language"
+menu_progress: "📈 Your Progress"
+menu_help: '❓ About the bot'
 help_message: 'Here we will describe how to use habit tracker'
 unexpected: 'Unexpected input'
 habit_header: 'New Habit'

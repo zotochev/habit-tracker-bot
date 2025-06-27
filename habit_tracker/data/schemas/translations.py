@@ -3,7 +3,6 @@ from pydantic import BaseModel
 
 class Translations(BaseModel):
     start: str = '<START>'
-    choose_language: str = '<CHOOSE_LANGUAGE>'
     language_chosen: str = '<LANGUAGE_CHOSEN>'
     create_habit: str = '<CREATE_HABIT>'
     button_create_habit: str = '<BUTTON_CREATE_HABIT>'
@@ -17,6 +16,8 @@ class Translations(BaseModel):
     menu_add_habit: str = '<MENU_ADD_HABIT>'
     menu_list_habits: str = '<MENU_LIST_HABITS>'
     menu_my_habits: str = '<MENU_MY_HABITS>'
+    menu_choose_language: str = '<MENU_CHOOSE_LANGUAGE>'
+    menu_progress: str = '<MENU_PROGRESS>'
     menu_help: str = '<MENU_HELP>'
     help_message: str = '<HELP_MESSAGE>'
     unexpected: str = '<UNEXPECTED>'

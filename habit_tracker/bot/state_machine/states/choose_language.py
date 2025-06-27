@@ -72,7 +72,7 @@ class ChooseLanguage(IState):
                 for language, icon in LanguageEnum.map().items()
             ]
         ])
-        text = '\n'.join(l.lang(lang).choose_language for lang in LanguageEnum.all())
+        text = '\n'.join(l.lang(lang).menu_choose_language for lang in LanguageEnum.all())
 
         self._message_with_button = await bot.bot_instance.send_message(
             chat_id=self._user_cache.telegram_id,
