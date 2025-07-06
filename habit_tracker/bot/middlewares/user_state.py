@@ -17,6 +17,7 @@ class UserStateMiddleware(BaseMiddleware):
         elif isinstance(event, Message):
             user_cache = cache.cache.user(event.chat.id)
             user_cache.last_datetime = event.date
+            user_cache.messanger.register_recv_message(event.message_id)
 
         if user_cache is not None:
             if user_cache.backend_id is None:
