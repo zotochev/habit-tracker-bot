@@ -26,6 +26,10 @@ class Messenger:
         try:
             await self.edit_message(text, reply_markup)
         except Exception as e:
+            if self.__main_message_id is not None and self.__main_message_id not in self.__sent_messages_ids:
+                self.__sent_messages_ids.append(self.__main_message_id)
+
+            self.__main_message_id = None
             logger.warning(f"{self.__class__.__name__}: update_main_message(mm={self.__main_message_id}): {e.__class__.__name__}: {e}")
             await self.send_message(text, reply_markup)
 

@@ -40,7 +40,7 @@ class AbstractHabitsListState(IState, ISuspendableState):
 
     async def on_restore(self) -> None:
         await super().on_restore()
-        await self._update_message()
+        await self.__update()
 
     async def _handle_message(self, message: Message) -> IState:
         return await self._handle()

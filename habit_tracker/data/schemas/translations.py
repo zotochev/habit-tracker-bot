@@ -54,3 +54,4 @@ class Translations(BaseModel):
     progress_weekly_trend: str = '<PROGRESS_WEEKLY_TREND>'
     progress_taglines: list[str] = ['<PROGRESS_TAGLINE_0>']
     button_back: str = '<BUTTON_BACK>'
+    my_habits_edit_button: str = '<my_habits_edit_button>'

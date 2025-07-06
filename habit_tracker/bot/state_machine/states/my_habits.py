@@ -17,14 +17,20 @@ logger = logging.getLogger(__name__)
 
 @register_state(HabitStates.my_habits)
 class MyHabitsState(AbstractHabitsListState):
+    HABIT_PROGRESS_CDATA = 'habit_progress'
+    HABIT_EDIT_CDATA = 'habit_edit'
+
     async def _handle_callback_query(self, callback_query: CallbackQuery) -> IState:
         await callback_query.answer()
 
         if callback_query.data in (self.SCROLL_LEFT, self.SCROLL_RIGHT):
             self._handel_pages(callback_query.data)
-        elif callback_query.data.startswith('habit'):
-            _, habit_id = callback_query.data.split('_')
+        elif callback_query.data.startswith(self.HABIT_PROGRESS_CDATA):
+            *_, habit_id = callback_query.data.split('_')
             return self._create(HabitStates.progress_habit, habit_id=int(habit_id))
+        elif callback_query.data.startswith(self.HABIT_EDIT_CDATA):
+            *_, habit_id = callback_query.data.split('_')
+            return self._create(HabitStates.edit_habit, habit_id=int(habit_id))
 
         return await self._handle()
 
@@ -49,6 +55,7 @@ class MyHabitsState(AbstractHabitsListState):
         )
 
     def _construct_keyboard(self):
+        l = localizator.localizator.lang(self._user_cache.language)
         keyboard = InlineKeyboardMarkup(inline_keyboard=[])
 
         start = (self._page_current - 1) * self.HABITS_PER_PAGE
@@ -59,7 +66,11 @@ class MyHabitsState(AbstractHabitsListState):
                 [
                     InlineKeyboardButton(
                         text=f'{habit.name}',
-                        callback_data=f'habit_{habit.id}',
+                        callback_data=f'{self.HABIT_PROGRESS_CDATA}_{habit.id}',
+                    ),
+                    InlineKeyboardButton(
+                        text=f'{l.my_habits_edit_button}',
+                        callback_data=f'{self.HABIT_EDIT_CDATA}_{habit.id}',
                     ),
                 ]
             )
@@ -78,3 +89,6 @@ class MyHabitsState(AbstractHabitsListState):
                 ]
             )
         return keyboard
+
+    async def _process_habit_button_callback(self, callback_query: CallbackQuery) -> None:
+        pass
