@@ -23,7 +23,8 @@ class MyHabitsState(AbstractHabitsListState):
             self._handel_pages(callback_query.data)
         elif callback_query.data.startswith('habit'):
             _, habit_id = callback_query.data.split('_')
-            return self._create(HabitStates.edit_habit, habit_id=int(habit_id))
+            # return self._create(HabitStates.edit_habit, habit_id=int(habit_id))
+            return self._create(HabitStates.progress_habit, habit_id=int(habit_id))
 
         return await self._handle()
 

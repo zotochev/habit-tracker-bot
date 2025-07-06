@@ -6,6 +6,7 @@ from core.requester import Requester, Response
 from data.schemas import UserUpdate, User, TelegramAccount, Habit, HabitBuffer, HabitCreate, HabitEventCreate, \
     HabitEvent, HabitUpdate
 from data.schemas.habit import HabitProgress
+from data.schemas.habit_event import HabitStatistics
 
 
 class BackendService:
@@ -93,3 +94,16 @@ class BackendService:
             return
 
         return HabitUpdate(**r.body)
+
+    async def get_habit_statistics(self, user_id: int, habit_id: int, target_date: date) -> HabitStatistics | None:
+        r: Response = await self._requester.get(
+            f"v1/habits/event/statistics",
+            query=jsonable_encoder(
+                {'user_id': user_id, 'habit_id': habit_id, 'today': target_date},
+            ),
+        )
+
+        if not r.ok():
+            return
+
+        return HabitStatistics(**r.body)

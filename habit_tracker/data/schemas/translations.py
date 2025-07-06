@@ -44,3 +44,12 @@ class Translations(BaseModel):
     habit_edit_updated: str = '<HABIT_EDIT_UPDATED>'
     habit_edit_header: str = '<HABIT_EDIT_HEADER>'
     habit_edit_button_submit: str = '<HABIT_EDIT_BUTTON_SUBMIT>'
+    progress_overall: str = '<PROGRESS_OVERALL>'
+    progress_day: str = '<PROGRESS_DAY>'
+    progress_week: str = '<PROGRESS_WEEK>'
+    progress_month: str = '<PROGRESS_MONTH>'
+    progress_streak: str = '<PROGRESS_STREAK>'
+    progress_best_habit: str = '<PROGRESS_BEST_HABIT>'
+    progress_worst_habit: str = '<PROGRESS_WORST_HABIT>'
+    progress_weekly_trend: str = '<PROGRESS_WEEKLY_TREND>'
+    progress_taglines: list[str] = ['<PROGRESS_TAGLINE_0>']

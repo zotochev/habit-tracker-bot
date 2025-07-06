@@ -10,17 +10,12 @@ from bot.menu import setup_menu
 from bot.state_machine.istate import IState
 from bot.state_machine.states_factory import register_state
 
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    pass
-
 
 logger = logging.getLogger(__name__)
 
 
 @register_state(HabitStates.init)
 class InitState(IState):
-    # state = HabitStates.init
 
     async def _handle_message(self, message: Message) -> IState:
         user_id = self.__get_user_id(message)

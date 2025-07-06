@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 import datetime
+from abc import abstractmethod
 from enum import StrEnum, auto
 import logging
 
@@ -107,7 +108,7 @@ class AbstractHabitState(IState, ISuspendableState):
             await callback_query.answer()
         return self
 
-    # abstract
+    @abstractmethod
     async def _handle_submit(self, callback_query: CallbackQuery):
         raise NotImplementedError
 
@@ -142,10 +143,9 @@ class AbstractHabitState(IState, ISuspendableState):
     def _is_habit_ready(self):
         return self._habit.name is not None
 
-    # abstract
+    @abstractmethod
     def _get_message_header(self) -> str:
         raise NotImplementedError
-        # return f"{localizator.localizator.lang(self._user_cache.language).habit_header}\n"
 
     def __set_next_state(self):
         if self._current_field != self.order[-1]:

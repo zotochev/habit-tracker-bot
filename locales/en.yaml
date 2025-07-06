@@ -39,3 +39,16 @@ my_habits_tagline: 'Here you can view, edit, or remove your habits — keep your
 habit_edit_updated: 'Habit updated'
 habit_edit_header: '✏️ Editing'
 habit_edit_button_submit: '💾 Save'
+progress_overall: "🔢 Overall"
+progress_day: "🗓️ Today"
+progress_week: "📅 This week"
+progress_month": "📆 This month"
+progress_best_habit: "🥇 Best Habit"
+progress_worst_habit: "🧠 Most Skipped"
+progress_weekly_trend: "📈 Progress trend"
+progress_streak: "🔥 Streak"
+progress_taglines:
+ - "Keep going — every habit counts!"
+ - "Here’s how you’ve been doing lately:"
+ - "Your consistency is paying off!"
+ - "Small steps. Big changes."

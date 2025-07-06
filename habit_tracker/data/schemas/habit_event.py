@@ -17,3 +17,19 @@ class HabitEvent(HabitEventBase):
     timestamp: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class HabitStatistics(BaseModel):
+    habit_id: int
+    name: str
+
+    percent_complete: int                 # overall completion %
+    today_done: int                       # how many times done today
+    times_per_day: int                    # how many needed per day
+    current_streak: int                   # consecutive full days done
+
+    week_done: int                        # total completions this week
+    week_expected: int                    # expected completions this week
+
+    month_done: int                       # total completions this month
+    month_expected: int                   # expected completions this month

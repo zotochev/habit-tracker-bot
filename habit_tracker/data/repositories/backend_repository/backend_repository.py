@@ -1,5 +1,6 @@
 from datetime import date
 
+from data.schemas.habit_event import HabitStatistics
 from data.services.backend_service.backend_service import BackendService
 from data.schemas import User, Habit, HabitBuffer, HabitEvent, HabitUpdate
 
@@ -34,3 +35,6 @@ class BackendRepository:
 
     async def update_habit(self, habit: HabitUpdate) -> Habit | None:
         return await self._service.update_habit(habit)
+
+    async def get_habit_statistics(self, user_id: int, habit_id: int, target_date: date) -> HabitStatistics:
+        return await self._service.get_habit_statistics(user_id, habit_id, target_date)
