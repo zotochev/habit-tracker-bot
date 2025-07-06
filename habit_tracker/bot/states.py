@@ -16,3 +16,5 @@ class HabitStates(Enum):
     todays_habits = auto()
     my_habits = auto()
     edit_habit = auto()
+
+    help_command = auto()

@@ -1,4 +1,4 @@
-from aiogram import Router, F
+from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
@@ -14,4 +14,4 @@ router = Router()
 async def todays_habit_handler(message: Message, user_cache: UserCache):
     if user_cache.state_machine.state not in (HabitStates.command_todays_habits, HabitStates.todays_habits):
         await user_cache.state_machine.set_state(HabitStates.todays_habits)
-        await message.delete()
+    await user_cache.messanger.remove_temp_messages()

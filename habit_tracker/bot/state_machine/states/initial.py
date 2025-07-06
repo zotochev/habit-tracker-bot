@@ -48,7 +48,8 @@ class InitState(IState):
         if user.language is None:
             return self._create(HabitStates.choose_language)
 
-        return self._create(HabitStates.wait_command)
+        # return self._create(HabitStates.wait_command)
+        return self._create(HabitStates.help_command)
 
     @staticmethod
     def __get_user_id(message: Message | CallbackQuery) -> int:

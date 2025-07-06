@@ -2,7 +2,7 @@ from __future__ import annotations
 import logging
 import datetime
 
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.state_machine.states.abstract_habit import AbstractHabitState
 from core import localizator
@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 @register_state(HabitStates.progress_habit)
 class ProgressHabitState(IState):
+    BACK_BUTTON_CALLBACK_DATA = 'back'
 
     def __init__(self,
                  backend_repository: BackendRepository,
@@ -36,24 +37,23 @@ class ProgressHabitState(IState):
         super().__init__(backend_repository, user_cache, state_factory)
         self._habit_id = habit_id
         self._habit: HabitUpdate | None = None
-        self._message: Message | None = None
 
     async def on_enter(self) -> None:
         await super().on_enter()
         self._habit = await self.__retrieve_habit()
 
         text = await self.__create_text()
+        keyboard = self.__create_keyboard()
 
-        self._message = await bot.bot_instance.send_message(
-            chat_id=self._user_cache.telegram_id,
-            text=text,
-            # reply_markup=reply_markup,
-        )
+        await self._user_cache.messanger.update_main_message(text, keyboard)
 
     async def _handle_message(self, message: Message) -> IState:
         return await self._handle()
 
     async def _handle_callback_query(self, callback_query: CallbackQuery) -> IState:
+        if callback_query.data == self.BACK_BUTTON_CALLBACK_DATA:
+            await callback_query.answer()
+            return self._create(HabitStates.end)
         return await self._handle()
 
     async def _handle(self):
@@ -61,11 +61,6 @@ class ProgressHabitState(IState):
 
     async def on_exit(self) -> None:
         await super().on_enter()
-        if self._message is not None:
-            try:
-                await self._message.delete()
-            except Exception as e:
-                logger.warning(f"{self.__class__.__name__}.on_exit() {e.__class__.__name__}:{e}")
 
     async def __get_stats(self, target_date: datetime.date) -> HabitStatistics:
         user_id = self._user_cache.backend_id
@@ -97,4 +92,14 @@ class ProgressHabitState(IState):
 
     async def __retrieve_habit(self) -> HabitUpdate:
         return await self._backend_repository.get_habit_by_user_id_and_id(self._user_cache.backend_id, self._habit_id)
+
+    def __create_keyboard(self) -> InlineKeyboardMarkup:
+        l = localizator.localizator.lang(self._user_cache.language)
+
+        return InlineKeyboardMarkup(inline_keyboard=[[
+            InlineKeyboardButton(
+                text=l.button_back,
+                callback_data=self.BACK_BUTTON_CALLBACK_DATA,
+            ),
+        ]])
 

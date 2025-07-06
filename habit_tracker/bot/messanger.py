@@ -10,7 +10,6 @@ import bot
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from aiogram.types import InlineKeyboardMarkup
-    from bot.cache import UserCache
 
 
 logger = logging.getLogger(__file__)
@@ -27,12 +26,12 @@ class Messenger:
         try:
             await self.edit_message(text, reply_markup)
         except Exception as e:
-            logger.warning(f"{self.__class__.__name__}: update_main_message: {e.__class__.__name__}: {e}")
+            logger.warning(f"{self.__class__.__name__}: update_main_message(mm={self.__main_message_id}): {e.__class__.__name__}: {e}")
             await self.send_message(text, reply_markup)
 
     async def edit_message(self, text: str, reply_markup: InlineKeyboardMarkup | None = None) -> Message:
         return await bot.bot_instance.edit_message_text(
-            text,
+            text=text,
             chat_id=self.__telegram_id,
             message_id=self.__main_message_id,
             reply_markup=reply_markup,
@@ -44,7 +43,10 @@ class Messenger:
             text=text,
             reply_markup=reply_markup,
         )
-        self.__sent_messages_ids.append(message.message_id)
+        if self.__main_message_id is None:
+            self.__main_message_id = message.message_id
+        else:
+            self.__sent_messages_ids.append(message.message_id)
         return message
 
     def register_recv_message(self, message_id: int) -> None:
@@ -55,6 +57,7 @@ class Messenger:
             if message_id == self.__main_message_id:
                 continue
 
+            logger.warning(f"{self.__class__.__name__}.remove_temp_messages(mm={self.__main_message_id}): {message_id}")
             try:
                 await bot.bot_instance.delete_message(
                     self.__telegram_id,

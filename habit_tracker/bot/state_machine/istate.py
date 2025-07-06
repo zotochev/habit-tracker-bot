@@ -2,14 +2,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 import logging
 
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import Message, CallbackQuery
 
-from data.factory import get_backend_repository
 from bot.states import HabitStates
-from data.schemas.user import LanguageEnum
-import bot
-from core import localizator
-from bot.menu import setup_menu
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -34,15 +29,23 @@ class IState(ABC):
 
     async def handle(self, message: Message | CallbackQuery) -> IState:
         if isinstance(message, Message):
-            logger.warning(f"{self.__class__.__name__}: handle: {message.text[:message.text.find('\n')]}")
+            text = self.__trim_text(message.text)
+            logger.warning(f"{self.__class__.__name__}: handle: {text}")
             new_state = await self._handle_message(message)
         elif isinstance(message, CallbackQuery):
-            logger.warning(f"{self.__class__.__name__}: handle: {message.message.text}")
+            text = self.__trim_text(message.message.text)
+            logger.warning(f"{self.__class__.__name__}: handle: {text}")
             new_state = await self._handle_callback_query(message)
         else:
             assert False, f"Unexpected message type: {type(message)}"
 
         return new_state
+
+    @staticmethod
+    def __trim_text(text: str) -> str:
+        line_feed_index = text.find('\n')
+        end_index = line_feed_index if line_feed_index > 0 else None
+        return text[:end_index]
 
     async def on_enter(self) -> None:
         logger.warning(f"{self.__class__.__name__}: on_enter")

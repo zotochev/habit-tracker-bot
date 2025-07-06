@@ -14,4 +14,4 @@ router = Router()
 async def choose_language_handler(message: Message, user_cache: UserCache):
     if user_cache.state_machine.state != HabitStates.choose_language:
         await user_cache.state_machine.set_state(HabitStates.choose_language)
-    await message.delete()
+    await user_cache.messanger.remove_temp_messages()

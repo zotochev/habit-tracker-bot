@@ -8,6 +8,7 @@ from bot.states import HabitStates
 from core import localizator
 
 from bot.state_machine.istate import IState
+
 from .abstract_habits_list_state import AbstractHabitsListState
 
 
@@ -23,7 +24,6 @@ class MyHabitsState(AbstractHabitsListState):
             self._handel_pages(callback_query.data)
         elif callback_query.data.startswith('habit'):
             _, habit_id = callback_query.data.split('_')
-            # return self._create(HabitStates.edit_habit, habit_id=int(habit_id))
             return self._create(HabitStates.progress_habit, habit_id=int(habit_id))
 
         return await self._handle()

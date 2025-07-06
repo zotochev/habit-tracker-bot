@@ -10,11 +10,10 @@ from pydantic import ValidationError
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 import dateparser
 
-from bot.states import HabitStates
-import bot
 from core import localizator
 from data.schemas import HabitBuffer
 
+from bot.states import HabitStates
 from bot.state_machine.istate import IState
 from bot.state_machine.isuspendable_state import ISuspendableState
 
@@ -58,7 +57,7 @@ class AbstractHabitState(IState, ISuspendableState):
                  state_factory: dict[HabitStates, IState.__class__],
                  ) -> None:
         super().__init__(backend_repository, user_cache, state_factory)
-        self._habit_message: Message | None = None
+        # self._habit_message: Message | None = None
 
         self._current_field = HabitField.name
         last_date = user_cache.last_datetime.date() if user_cache.last_datetime else None
@@ -74,7 +73,7 @@ class AbstractHabitState(IState, ISuspendableState):
         self.__last_error: str | None = None
 
     async def _handle_message(self, message: Message) -> IState:
-        await message.delete()
+        # await message.delete()
 
         if self._habit.start_date is None:
             self._habit.start_date = message.date.date()
@@ -98,7 +97,6 @@ class AbstractHabitState(IState, ISuspendableState):
     async def _handle_callback_query(self, callback_query: CallbackQuery) -> IState:
         if callback_query.data == HABIT_BUTTON_SUBMIT:
             await self._handle_submit(callback_query)
-            await callback_query.message.delete()
             return self._create(HabitStates.end)
         elif self._current_field != HabitField(callback_query.data):
             self._current_field = HabitField(callback_query.data)
@@ -134,11 +132,6 @@ class AbstractHabitState(IState, ISuspendableState):
 
     async def on_suspend(self) -> None:
         await super().on_suspend()
-        if self._habit_message is not None:
-            try:
-                await self._habit_message.delete()
-            except Exception as e:
-                logger.warning(f"{self.__class__.__name__}.on_suspend: {e.__class__.__name__}: {e}")
 
     def _is_habit_ready(self):
         return self._habit.name is not None
@@ -179,21 +172,7 @@ class AbstractHabitState(IState, ISuspendableState):
     async def __update_habit_message(self):
         self.__update_start_habit_time()
         text, reply_markup = self.__create_habit_message()
-        send_new = self._habit_message is None
-
-        try:
-            if self._habit_message is not None:
-                await self._habit_message.edit_text(text, reply_markup=reply_markup)
-        except Exception as e:
-            logger.warning(f"{self.__class__.__name__}.__update_habit_message {e.__class__.__name__}: {e}")
-            send_new = True
-
-        if send_new:
-            self._habit_message = await bot.bot_instance.send_message(
-                chat_id=self._user_cache.telegram_id,
-                text=text,
-                reply_markup=reply_markup,
-            )
+        await self._user_cache.messanger.update_main_message(text, reply_markup)
 
     def __update_start_habit_time(self) -> None:
         if (

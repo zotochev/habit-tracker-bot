@@ -53,16 +53,6 @@ class ProgressState(IState):
 
     async def on_exit(self) -> None:
         await super().on_enter()
-        if self._progress_message is not None:
-            try:
-                await self._progress_message.delete()
-            except Exception as e:
-                logger.warning(f"{self.__class__.__name__}.on_exit() {e.__class__.__name__}:{e}")
-
-    # async def __get_stats(self, habit_id: int, target_date: datetime.date) -> HabitStats:
-    #     user_id = self._user_cache.backend_id
-    #
-    #     return await self._backend_repository.get_statistics(user_id, self._, target_date)
 
     async def __create_text(self) -> str:
         l = localizator.localizator.lang(self._user_cache.language)

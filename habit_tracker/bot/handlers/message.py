@@ -28,17 +28,18 @@ def is_command_message(message: Message) -> bool:
 
 @router.message(lambda message: not is_command_message(message))
 async def habit_name(message: Message, user_cache: UserCache):
-    l = localizator.localizator.lang(user_cache.language)
+    # l = localizator.localizator.lang(user_cache.language)
 
-    if message.content_type != ContentType.TEXT:
-        await message.answer(l.wrong_type_habit_name)
-        return
+    # if message.content_type != ContentType.TEXT:
+    #     await message.answer(l.wrong_type_habit_name)
+    #     return
 
-    if not is_valid_habit_name(message.text, max_words=999, max_length=300):
-        await message.answer(l.habit_name_too_long)
-        return
+    # if not is_valid_habit_name(message.text, max_words=999, max_length=300):
+    #     await message.answer(l.habit_name_too_long)
+    #     return
 
     await user_cache.state_machine.handle(message)
+    await user_cache.messanger.remove_temp_messages()
 
 
 # def create_date_keyboard():

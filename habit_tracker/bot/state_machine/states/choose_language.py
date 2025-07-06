@@ -34,7 +34,7 @@ class ChooseLanguage(IState):
     async def _handle_message(self, message: Message) -> IState:
         message_text = message.text
         result = await self._handle(message_text)
-        await message.delete()
+        # await message.delete()
         return result
 
     async def _handle_callback_query(self, callback_query: CallbackQuery) -> IState:
@@ -73,18 +73,7 @@ class ChooseLanguage(IState):
         ])
         text = '\n'.join(l.lang(lang).menu_choose_language for lang in LanguageEnum.all())
 
-        self._message_with_button = await bot.bot_instance.send_message(
-            chat_id=self._user_cache.telegram_id,
-            text=text,
-            reply_markup=keyboard,
-        )
+        await self._user_cache.messanger.update_main_message(text, keyboard)
 
     async def on_exit(self) -> None:
         await super().on_exit()
-        if self._message_with_button is not None:
-            try:
-                await self._message_with_button.delete()
-            except Exception as e:
-                logger.warning(f"{self.__class__.__name__}.on_exit: {e.__class__.__name__}: {e}")
-
-
