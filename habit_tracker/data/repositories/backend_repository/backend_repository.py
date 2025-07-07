@@ -2,7 +2,14 @@ from datetime import date
 
 from data.schemas.habit_event import HabitStatistics
 from data.services.backend_service.backend_service import BackendService
-from data.schemas import User, Habit, HabitBuffer, HabitEvent, HabitUpdate
+from data.schemas import (
+    User,
+    Habit,
+    HabitBuffer,
+    HabitEvent,
+    HabitUpdate,
+    CommonProgress,
+)
 
 
 class BackendRepository:
@@ -38,3 +45,6 @@ class BackendRepository:
 
     async def get_habit_statistics(self, user_id: int, habit_id: int, target_date: date) -> HabitStatistics:
         return await self._service.get_habit_statistics(user_id, habit_id, target_date)
+
+    async def get_all_habits_statistics(self, user_id: int, today: date) -> CommonProgress | None:
+        return await self._service.get_all_habits_statistics(user_id, today)

@@ -3,10 +3,19 @@ from datetime import date
 from fastapi.encoders import jsonable_encoder
 
 from core.requester import Requester, Response
-from data.schemas import UserUpdate, User, TelegramAccount, Habit, HabitBuffer, HabitCreate, HabitEventCreate, \
-    HabitEvent, HabitUpdate
+from data.schemas import (
+    UserUpdate,
+    User,
+    TelegramAccount,
+    Habit,
+    HabitBuffer,
+    HabitCreate,
+    HabitEvent,
+    HabitUpdate,
+    HabitStatistics,
+    CommonProgress,
+)
 from data.schemas.habit import HabitProgress
-from data.schemas.habit_event import HabitStatistics
 
 
 class BackendService:
@@ -107,3 +116,16 @@ class BackendService:
             return
 
         return HabitStatistics(**r.body)
+
+    async def get_all_habits_statistics(self, user_id: int, today: date) -> CommonProgress | None:
+        r: Response = await self._requester.get(
+            f"v1/habits/event/statistics/all",
+            query=jsonable_encoder(
+                {'user_id': user_id, 'today': today},
+            ),
+        )
+
+        if not r.ok():
+            return
+
+        return CommonProgress(**r.body)

@@ -33,3 +33,17 @@ class HabitStatistics(BaseModel):
 
     month_done: int                       # total completions this month
     month_expected: int                   # expected completions this month
+
+
+class CommonProgress(BaseModel):
+    habit_count: int
+    percent_complete: int
+    total_completed: int
+    total_expected: int
+
+    today_done: int
+    today_expected: int
+    week_done: int
+    week_expected: int
+    month_done: int
+    month_expected: int

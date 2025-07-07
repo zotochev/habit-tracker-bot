@@ -2,7 +2,13 @@ from .send_message import SendMessageRequest
 from .telegram_account import TelegramAccount, TelegramAccountCreate, TelegramAccountBase
 from .user import User, UserCreate, UserUpdate
 from .habit import Habit, HabitCreate, HabitUpdate, HabitBuffer
-from .habit_event import HabitEvent, HabitEventCreate, HabitEventBase
+from .habit_event import (
+    HabitEvent,
+    HabitEventCreate,
+    HabitEventBase,
+    HabitStatistics,
+    CommonProgress,
+)
 
 
 __all__ = [
@@ -20,4 +26,6 @@ __all__ = [
     'HabitEvent',
     'HabitEventCreate',
     'HabitEventBase',
+    'HabitStatistics',
+    'CommonProgress',
 ]

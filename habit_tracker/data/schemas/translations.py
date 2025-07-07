@@ -45,6 +45,7 @@ class Translations(BaseModel):
     habit_edit_header: str = '<HABIT_EDIT_HEADER>'
     habit_edit_button_submit: str = '<HABIT_EDIT_BUTTON_SUBMIT>'
     progress_overall: str = '<PROGRESS_OVERALL>'
+    progress_total_habits: str = '<PROGRESS_TOTAL_HABITS>'
     progress_day: str = '<PROGRESS_DAY>'
     progress_week: str = '<PROGRESS_WEEK>'
     progress_month: str = '<PROGRESS_MONTH>'
