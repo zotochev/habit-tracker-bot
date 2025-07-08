@@ -55,3 +55,8 @@ progress_taglines:
 button_back: '< Back'
 my_habits_edit_button: '✏️ Edit'
 progress_total_habits: '🧩 Active habits'
+my_habits_delete_button: '🗑 Delete'
+delete_are_you_sure_button: 'Are you sure you want to delete'
+delete_habit_deleted: 'Habit has been deleted'
+yes_button: '✅ Yes'
+no_button: '❌ No'

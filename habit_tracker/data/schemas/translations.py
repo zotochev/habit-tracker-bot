@@ -55,4 +55,9 @@ class Translations(BaseModel):
     progress_weekly_trend: str = '<PROGRESS_WEEKLY_TREND>'
     progress_taglines: list[str] = ['<PROGRESS_TAGLINE_0>']
     button_back: str = '<BUTTON_BACK>'
-    my_habits_edit_button: str = '<my_habits_edit_button>'
+    my_habits_edit_button: str = '<MY_HABITS_EDIT_BUTTON>'
+    my_habits_delete_button: str = '<MY_HABITS_DELETE_BUTTON>'
+    delete_are_you_sure_button: str = '<DELETE_ARE_YOU_SURE_BUTTON>'
+    delete_habit_deleted: str = '<DELETE_HABIT_DELETED>'
+    yes_button: str = '<YES_BUTTON>'
+    no_button: str = '<NO_BUTTON>'

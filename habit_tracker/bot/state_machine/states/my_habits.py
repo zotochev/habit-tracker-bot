@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 class MyHabitsState(AbstractHabitsListState):
     HABIT_PROGRESS_CDATA = 'habit_progress'
     HABIT_EDIT_CDATA = 'habit_edit'
+    HABIT_DELETE_CDATA = 'habit_delete'
 
     async def _handle_callback_query(self, callback_query: CallbackQuery) -> IState:
         await callback_query.answer()
@@ -31,6 +32,9 @@ class MyHabitsState(AbstractHabitsListState):
         elif callback_query.data.startswith(self.HABIT_EDIT_CDATA):
             *_, habit_id = callback_query.data.split('_')
             return self._create(HabitStates.edit_habit, habit_id=int(habit_id))
+        elif callback_query.data.startswith(self.HABIT_DELETE_CDATA):
+            *_, habit_id = callback_query.data.split('_')
+            return self._create(HabitStates.delete_habit, habit_id=int(habit_id))
 
         return await self._handle()
 
@@ -71,6 +75,10 @@ class MyHabitsState(AbstractHabitsListState):
                     InlineKeyboardButton(
                         text=f'{l.my_habits_edit_button}',
                         callback_data=f'{self.HABIT_EDIT_CDATA}_{habit.id}',
+                    ),
+                    InlineKeyboardButton(
+                        text=f'{l.my_habits_delete_button}',
+                        callback_data=f'{self.HABIT_DELETE_CDATA}_{habit.id}',
                     ),
                 ]
             )

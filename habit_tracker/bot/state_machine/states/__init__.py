@@ -9,3 +9,4 @@ from .my_habits import MyHabitsState
 from .progress_state import ProgressState
 from .progress_habit_state import ProgressHabitState
 from .help_command import HelpCommand
+from .delete_habit import DeleteState

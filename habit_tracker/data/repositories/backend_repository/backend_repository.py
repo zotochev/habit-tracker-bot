@@ -48,3 +48,6 @@ class BackendRepository:
 
     async def get_all_habits_statistics(self, user_id: int, today: date) -> CommonProgress | None:
         return await self._service.get_all_habits_statistics(user_id, today)
+
+    async def delete_habit(self, user_id: int, habit_id: int) -> None:
+        return await self._service.delete_habit(user_id, habit_id)

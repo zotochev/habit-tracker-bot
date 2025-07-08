@@ -129,3 +129,11 @@ class BackendService:
             return
 
         return CommonProgress(**r.body)
+
+    async def delete_habit(self, user_id: int, habit_id: int) -> None:
+        r: Response = await self._requester.delete(f"v1/habits/{habit_id}", query={'user_id': user_id})
+
+        if not r.ok():
+            return
+
+        return
