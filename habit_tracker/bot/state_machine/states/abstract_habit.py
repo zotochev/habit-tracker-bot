@@ -35,9 +35,6 @@ class HabitField(StrEnum):
     end_date = auto()
 
 
-HABIT_BUTTON_SUBMIT = 'habit_button_submit'
-
-
 class FieldHandleError(Exception):
     pass
 
@@ -50,6 +47,9 @@ class AbstractHabitState(IState, ISuspendableState):
         HabitField.start_date,
         HabitField.end_date,
     )
+
+    HABIT_BUTTON_SUBMIT = 'habit_button_submit'
+    HABIT_BUTTON_BACK = 'habit_button_back'
 
     def __init__(self,
                  backend_repository: BackendRepository,
@@ -73,8 +73,6 @@ class AbstractHabitState(IState, ISuspendableState):
         self.__last_error: str | None = None
 
     async def _handle_message(self, message: Message) -> IState:
-        # await message.delete()
-
         if self._habit.start_date is None:
             self._habit.start_date = message.date.date()
 
@@ -95,8 +93,10 @@ class AbstractHabitState(IState, ISuspendableState):
         return await self._handle()
 
     async def _handle_callback_query(self, callback_query: CallbackQuery) -> IState:
-        if callback_query.data == HABIT_BUTTON_SUBMIT:
+        if callback_query.data == self.HABIT_BUTTON_SUBMIT:
             await self._handle_submit(callback_query)
+            return self._create(HabitStates.end)
+        elif callback_query.data == self.HABIT_BUTTON_BACK:
             return self._create(HabitStates.end)
         elif self._current_field != HabitField(callback_query.data):
             self._current_field = HabitField(callback_query.data)
@@ -187,15 +187,15 @@ class AbstractHabitState(IState, ISuspendableState):
         raise NotImplementedError
 
     def __create_habit_message(self):
-        l = localizator.localizator
+        l = localizator.localizator.lang(self._user_cache.language)
         translations = {
-            HabitField.name: l.lang(self._user_cache.language).habit_field_name,
-            HabitField.description: l.lang(self._user_cache.language).habit_field_description,
-            HabitField.times_per_day: l.lang(self._user_cache.language).habit_field_times_per_day,
-            HabitField.start_date: l.lang(self._user_cache.language).habit_field_start_date,
-            HabitField.end_date: l.lang(self._user_cache.language).habit_field_end_date,
+            HabitField.name: l.habit_field_name,
+            HabitField.description: l.habit_field_description,
+            HabitField.times_per_day: l.habit_field_times_per_day,
+            HabitField.start_date: l.habit_field_start_date,
+            HabitField.end_date: l.habit_field_end_date,
 
-            HABIT_BUTTON_SUBMIT: self._get_submit_button_text(),
+            self.HABIT_BUTTON_SUBMIT: self._get_submit_button_text(),
         }
 
         text = self._get_message_header()
@@ -225,11 +225,20 @@ class AbstractHabitState(IState, ISuspendableState):
             reply_markup.inline_keyboard.append(
                 [
                     InlineKeyboardButton(
-                        text=translations[HABIT_BUTTON_SUBMIT],
-                        callback_data=HABIT_BUTTON_SUBMIT,
+                        text=translations[self.HABIT_BUTTON_SUBMIT],
+                        callback_data=self.HABIT_BUTTON_SUBMIT,
                     ),
                 ]
             )
+
+        reply_markup.inline_keyboard.append(
+            [
+                InlineKeyboardButton(
+                    text=l.button_back,
+                    callback_data=self.HABIT_BUTTON_BACK,
+                ),
+            ]
+        )
 
         return text, reply_markup
 

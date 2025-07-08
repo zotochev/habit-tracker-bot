@@ -52,7 +52,7 @@ progress_taglines:
  - "Here’s how you’ve been doing lately:"
  - "Your consistency is paying off!"
  - "Small steps. Big changes."
-button_back: '< Back'
+button_back: '⬅️ Back'
 my_habits_edit_button: '✏️ Edit'
 progress_total_habits: '🧩 Active habits'
 my_habits_delete_button: '🗑 Delete'
