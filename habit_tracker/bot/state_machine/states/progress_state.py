@@ -46,11 +46,6 @@ class ProgressState(IState):
         text = await self.__create_text()
 
         await self._user_cache.messanger.update_main_message(text)
-        # self._progress_message = await bot.bot_instance.send_message(
-        #     chat_id=self._user_cache.telegram_id,
-        #     text=text,
-        #     # reply_markup=reply_markup,
-        # )
 
     async def on_exit(self) -> None:
         await super().on_enter()

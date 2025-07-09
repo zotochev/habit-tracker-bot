@@ -1,3 +1,4 @@
+from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -6,6 +7,10 @@ from bot.state_machine.state_machine import StateMachine
 from bot.state_machine.states_factory import STATES_FACTORY
 from data.schemas.user import LanguageEnum
 from .messanger import Messenger
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .messanger_queue import MessangerQueue
 
 
 @dataclass
@@ -19,14 +24,15 @@ class UserCache:
 
 
 class Cache:
-    def __init__(self):
+    def __init__(self, messanger_queue: MessangerQueue):
         self.__users_cache: dict[int, UserCache] = {}
+        self.__messanger_queue = messanger_queue
 
     def user(self, telegram_id: int):
         if telegram_id not in self.__users_cache:
             user_cache = UserCache(telegram_id=telegram_id)
             user_cache.state_machine = StateMachine(HabitStates.init, user_cache, STATES_FACTORY)
-            user_cache.messanger = Messenger(telegram_id)
+            user_cache.messanger = self.__messanger_queue.get_messanger(telegram_id)
             self.__users_cache[telegram_id] = user_cache
 
         return self.__users_cache[telegram_id]
@@ -38,7 +44,7 @@ class Cache:
 cache: Cache | None = None
 
 
-def setup_cache():
+def setup_cache(messanger_queue: MessangerQueue):
     global cache
 
-    cache = Cache()
+    cache = Cache(messanger_queue)

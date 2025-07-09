@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import logging
+from functools import partial
 from itertools import chain
+from collections import deque
 
 from aiogram.types import Message
 
@@ -22,36 +24,17 @@ class Messenger:
         self.__recv_messages_ids = []
         self.__sent_messages_ids = []
 
+        self.__queue = deque()
+
     async def update_main_message(self, text: str, reply_markup: InlineKeyboardMarkup | None = None) -> None:
-        try:
-            await self.edit_message(text, reply_markup)
-        except Exception as e:
-            if self.__main_message_id is not None and self.__main_message_id not in self.__sent_messages_ids:
-                self.__sent_messages_ids.append(self.__main_message_id)
-
-            self.__main_message_id = None
-            logger.warning(f"{self.__class__.__name__}: update_main_message(mm={self.__main_message_id}): {e.__class__.__name__}: {e}")
-            await self.send_message(text, reply_markup)
-
-    async def edit_message(self, text: str, reply_markup: InlineKeyboardMarkup | None = None) -> Message:
-        return await bot.bot_instance.edit_message_text(
-            text=text,
-            chat_id=self.__telegram_id,
-            message_id=self.__main_message_id,
-            reply_markup=reply_markup,
+        self.__queue.append(
+            partial(self.__update_main_message, text, reply_markup)
         )
 
-    async def send_message(self, text: str, reply_markup: InlineKeyboardMarkup | None = None) -> Message:
-        message = await bot.bot_instance.send_message(
-            chat_id=self.__telegram_id,
-            text=text,
-            reply_markup=reply_markup,
-        )
-        if self.__main_message_id is None:
-            self.__main_message_id = message.message_id
-        else:
-            self.__sent_messages_ids.append(message.message_id)
-        return message
+    async def process_message(self) -> None:
+        if self.__queue:
+            task = self.__queue.popleft()
+            await task()
 
     def register_recv_message(self, message_id: int) -> None:
         self.__recv_messages_ids.append(message_id)
@@ -72,3 +55,34 @@ class Messenger:
 
         self.__recv_messages_ids.clear()
         self.__sent_messages_ids.clear()
+
+    async def __update_main_message(self, text: str, reply_markup: InlineKeyboardMarkup | None = None) -> None:
+        try:
+            await self.__edit_message(text, reply_markup)
+        except Exception as e:
+            if self.__main_message_id is not None and self.__main_message_id not in self.__sent_messages_ids:
+                self.__sent_messages_ids.append(self.__main_message_id)
+
+            self.__main_message_id = None
+            logger.warning(f"{self.__class__.__name__}: update_main_message(mm={self.__main_message_id}): {e.__class__.__name__}: {e}")
+            await self.__send_message(text, reply_markup)
+
+    async def __edit_message(self, text: str, reply_markup: InlineKeyboardMarkup | None = None) -> Message:
+        return await bot.bot_instance.edit_message_text(
+            text=text,
+            chat_id=self.__telegram_id,
+            message_id=self.__main_message_id,
+            reply_markup=reply_markup,
+        )
+
+    async def __send_message(self, text: str, reply_markup: InlineKeyboardMarkup | None = None) -> Message:
+        message = await bot.bot_instance.send_message(
+            chat_id=self.__telegram_id,
+            text=text,
+            reply_markup=reply_markup,
+        )
+        if self.__main_message_id is None:
+            self.__main_message_id = message.message_id
+        else:
+            self.__sent_messages_ids.append(message.message_id)
+        return message
