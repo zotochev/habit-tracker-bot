@@ -53,9 +53,9 @@ class InitState(IState):
     @staticmethod
     def __get_user_id(message: Message | CallbackQuery) -> int:
         if isinstance(message, Message):
-            return message.from_user.id
+            return message.chat.id
         elif isinstance(message, CallbackQuery):
-            return message.from_user.id
+            return message.message.chat.id
 
     @staticmethod
     def __get_user_name(message: Message | CallbackQuery) -> str:
