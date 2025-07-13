@@ -22,7 +22,7 @@ class BackendService:
     def __init__(self, requester: Requester) -> None:
         self._requester: Requester = requester
 
-    async def register_user_by_telegram(self, user_name: str, telegram_id: int) -> TelegramAccount | None:
+    async def register_user_by_telegram(self, user_name: str, telegram_id: int) -> User | None:
         r: Response = await self._requester.post(
             "v1/auth/signup-telegram",
             body={'name': user_name, 'telegram_id': telegram_id},
@@ -31,7 +31,7 @@ class BackendService:
         if not r.ok():
             return
 
-        return TelegramAccount(**r.body)
+        return User(**r.body)
 
     async def update_user_language(self, backend_user_id: int, language: str) -> UserUpdate | None:
         r: Response = await self._requester.patch(

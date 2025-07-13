@@ -39,7 +39,7 @@ class InitState(IState):
                 telegram_id=user_id,
             )
             assert telegram_account, f"Failed to register user: {user_id}:{user_name}"
-            self._user_cache.backend_id = telegram_account.user_id
+            self._user_cache.backend_id = telegram_account.id
             return self._create(HabitStates.choose_language)
 
         self._user_cache.backend_id = user.id
@@ -48,7 +48,6 @@ class InitState(IState):
         if user.language is None:
             return self._create(HabitStates.choose_language)
 
-        # return self._create(HabitStates.wait_command)
         return self._create(HabitStates.help_command)
 
     @staticmethod
