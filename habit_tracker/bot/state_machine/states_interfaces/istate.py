@@ -5,6 +5,8 @@ import logging
 from aiogram.types import Message, CallbackQuery
 
 from bot.states import HabitStates
+from .Itext_handable import ITextHandable
+from .istatable import IStatable
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -15,13 +17,12 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class IState(ABC):
-    state: HabitStates = None
-
+class IState(IStatable, ITextHandable):
     def __init__(self,
                  backend_repository: BackendRepository,
                  user_cache: UserCache,
                  state_factory: dict[HabitStates, IState.__class__],
+                 **kwargs,
                  ) -> None:
         self._backend_repository = backend_repository
         self._user_cache = user_cache
@@ -30,12 +31,13 @@ class IState(ABC):
     async def handle(self, message: Message | CallbackQuery) -> IState:
         if isinstance(message, Message):
             text = self.__trim_text(message.text)
-            logger.warning(f"{self.__class__.__name__}: handle: {text}")
+            logger.warning(f"{self.__class__.__name__}: handle message: {text}")
             new_state = await self._handle_message(message)
         elif isinstance(message, CallbackQuery):
             text = self.__trim_text(message.message.text)
-            logger.warning(f"{self.__class__.__name__}: handle: {text}")
+            logger.warning(f"{self.__class__.__name__}: handle callback query: {text}")
             new_state = await self._handle_callback_query(message)
+            logger.warning(f"{self.__class__.__name__}: handle callback query {self} -> {new_state}")
         else:
             assert False, f"Unexpected message type: {type(message)}"
 

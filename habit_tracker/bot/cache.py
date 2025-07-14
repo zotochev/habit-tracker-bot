@@ -17,10 +17,14 @@ if TYPE_CHECKING:
 class UserCache:
     telegram_id: int
     language: LanguageEnum | None = None
+    timezone: str | None = None
     backend_id: int | None = None
     state_machine: StateMachine | None = None
     last_datetime: datetime | None = None
     messanger: Messenger | None = None
+
+    def is_registered(self) -> bool:
+        return self.backend_id is not None
 
 
 class Cache:

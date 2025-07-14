@@ -14,8 +14,8 @@ from core import localizator
 from data.schemas import HabitBuffer
 
 from bot.states import HabitStates
-from bot.state_machine.istate import IState
-from bot.state_machine.isuspendable_state import ISuspendableState
+from bot.state_machine.states_interfaces import IState
+from bot.state_machine.states_interfaces import ISuspendableState
 
 from typing import TYPE_CHECKING
 

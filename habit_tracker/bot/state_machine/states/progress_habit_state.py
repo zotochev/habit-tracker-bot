@@ -4,11 +4,9 @@ import datetime
 
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 
-from bot.state_machine.states.abstract_habit import AbstractHabitState
 from core import localizator
-import bot
 from bot.states import HabitStates
-from bot.state_machine.istate import IState
+from bot.state_machine.states_interfaces import IState
 from bot.state_machine.states_factory import register_state
 
 from typing import TYPE_CHECKING

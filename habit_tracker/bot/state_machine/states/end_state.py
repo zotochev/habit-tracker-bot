@@ -6,10 +6,9 @@ from aiogram.types import Message, CallbackQuery
 from bot.states import HabitStates
 from bot.state_machine.states_factory import register_state
 
-from bot.state_machine.istate import IState
+from bot.state_machine.states_interfaces import IState
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     pass
 

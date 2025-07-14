@@ -7,7 +7,7 @@ from bot.state_machine.states_factory import register_state
 from bot.states import HabitStates
 from core import localizator
 
-from bot.state_machine.istate import IState
+from bot.state_machine.states_interfaces import IState
 
 from .abstract_habits_list_state import AbstractHabitsListState
 

@@ -5,6 +5,7 @@ from aiogram.types import (
 )
 
 from bot.cache import UserCache
+from bot.state_machine.states.initial import logger
 from core import localizator
 
 
@@ -30,9 +31,10 @@ def is_command_message(message: Message) -> bool:
 async def habit_name(message: Message, user_cache: UserCache):
     # l = localizator.localizator.lang(user_cache.language)
 
-    # if message.content_type != ContentType.TEXT:
-    #     await message.answer(l.wrong_type_habit_name)
-    #     return
+    if not user_cache.state_machine.is_handable(message.content_type):
+        logger.warning(f"default message handler: wrong content_type: {message.content_type}")
+        await message.delete()
+        return
 
     # if not is_valid_habit_name(message.text, max_words=999, max_length=300):
     #     await message.answer(l.habit_name_too_long)

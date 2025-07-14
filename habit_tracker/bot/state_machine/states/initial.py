@@ -7,7 +7,7 @@ from bot.states import HabitStates
 import bot
 from bot.menu import setup_menu
 
-from bot.state_machine.istate import IState
+from bot.state_machine.states_interfaces import IState
 from bot.state_machine.states_factory import register_state
 
 
@@ -34,19 +34,17 @@ class InitState(IState):
 
         # if there is no data on backend register user and ask for language
         if user is None:
-            telegram_account = await self._backend_repository.register_user_by_telegram(
-                user_name=user_name,
-                telegram_id=user_id,
-            )
-            assert telegram_account, f"Failed to register user: {user_id}:{user_name}"
-            self._user_cache.backend_id = telegram_account.id
-            return self._create(HabitStates.choose_language)
+            # telegram_account = await self._backend_repository.register_user_by_telegram(
+            #     user_name=user_name,
+            #     telegram_id=user_id,
+            # )
+            # assert telegram_account, f"Failed to register user: {user_id}:{user_name}"
+            # self._user_cache.backend_id = telegram_account.id
+            return self._create(HabitStates.registration)  #, user_id=user_id, user_name=user_name)
 
         self._user_cache.backend_id = user.id
         self._user_cache.language = user.language
-
-        if user.language is None:
-            return self._create(HabitStates.choose_language)
+        self._user_cache.timezone = user.timezone
 
         return self._create(HabitStates.help_command)
 

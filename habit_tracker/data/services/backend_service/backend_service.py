@@ -33,16 +33,16 @@ class BackendService:
 
         return User(**r.body)
 
-    async def update_user_language(self, backend_user_id: int, language: str) -> UserUpdate | None:
+    async def update_user(self, user: UserUpdate) -> User | None:
         r: Response = await self._requester.patch(
             "v1/users",
-            body={'language': language, 'id': backend_user_id},
+            body=user.model_dump(exclude_none=True),
         )
 
         if not r.ok():
             return
 
-        return UserUpdate(**r.body)
+        return User(**r.body)
 
     async def get_user_by_telegram(self, telegram_id: int) -> User | None:
         r: Response = await self._requester.get("v1/users/telegram", query={'telegram_id': telegram_id})

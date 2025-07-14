@@ -28,6 +28,7 @@ class LanguageEnum(str, enum.Enum):
 class UserBase(BaseModel):
     name: Optional[str] = None
     language: LanguageEnum = LanguageEnum.ru
+    timezone: str = 'UTC'
 
 
 class UserCreate(UserBase):
@@ -38,11 +39,11 @@ class UserUpdate(UserBase):
     id: int
     name: Optional[str] = None
     language: Optional[LanguageEnum] = None
+    timezone: str | None = None
 
 
 class User(UserBase):
     id: int
-    # telegram_id: Optional[TelegramAccount] = None
     telegram_id: Optional[int] = None
 
     model_config = ConfigDict(from_attributes=True)

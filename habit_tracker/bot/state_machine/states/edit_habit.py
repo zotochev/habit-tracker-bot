@@ -14,7 +14,7 @@ from .abstract_habit import AbstractHabitState
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from bot.cache import UserCache
-    from bot.state_machine.istate import IState
+    from bot.state_machine.states_interfaces import IState
     from data.repositories.backend_repository.backend_repository import BackendRepository
 
 

@@ -5,10 +5,9 @@ from abc import abstractmethod
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup
 
 from bot.states import HabitStates
-import bot
 
-from bot.state_machine.istate import IState
-from bot.state_machine.isuspendable_state import ISuspendableState
+from bot.state_machine.states_interfaces import IState
+from bot.state_machine.states_interfaces import ISuspendableState
 
 from typing import TYPE_CHECKING
 

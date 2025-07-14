@@ -6,6 +6,7 @@ from itertools import chain
 from collections import deque
 
 from aiogram.types import Message
+from aiogram.exceptions import TelegramBadRequest, TelegramNotFound, TelegramAPIError
 
 import bot
 
@@ -59,13 +60,21 @@ class Messenger:
     async def __update_main_message(self, text: str, reply_markup: InlineKeyboardMarkup | None = None) -> None:
         try:
             await self.__edit_message(text, reply_markup)
-        except Exception as e:
-            if self.__main_message_id is not None and self.__main_message_id not in self.__sent_messages_ids:
-                self.__sent_messages_ids.append(self.__main_message_id)
-
-            self.__main_message_id = None
+        except TelegramAPIError as e:
             logger.warning(f"{self.__class__.__name__}: update_main_message(mm={self.__main_message_id}): {e.__class__.__name__}: {e}")
-            await self.__send_message(text, reply_markup)
+
+            match e.message:
+                case 'Bad Request: message to edit not found':
+                    if self.__main_message_id is not None and self.__main_message_id not in self.__sent_messages_ids:
+                        self.__sent_messages_ids.append(self.__main_message_id)
+                    self.__main_message_id = None
+
+                    await self.__send_message(text, reply_markup)
+                case 'Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message':
+                    pass
+
+        except Exception as e:
+            logger.error(f"{self.__class__.__name__}: update_main_message(mm={self.__main_message_id}): {e.__class__.__name__}: {e}")
 
     async def __edit_message(self, text: str, reply_markup: InlineKeyboardMarkup | None = None) -> Message:
         return await bot.bot_instance.edit_message_text(

@@ -4,12 +4,12 @@ import logging
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.states import HabitStates
+from data.schemas import UserUpdate
 from data.schemas.user import LanguageEnum
-import bot
 from core import localizator
 from bot.state_machine.states_factory import register_state
 
-from bot.state_machine.istate import IState
+from bot.state_machine.states_interfaces import IState
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -34,7 +34,6 @@ class ChooseLanguage(IState):
     async def _handle_message(self, message: Message) -> IState:
         message_text = message.text
         result = await self._handle(message_text)
-        # await message.delete()
         return result
 
     async def _handle_callback_query(self, callback_query: CallbackQuery) -> IState:
@@ -54,9 +53,8 @@ class ChooseLanguage(IState):
             return self
 
         self._user_cache.language = language
-        user = await self._backend_repository.update_user_language(
-            self._user_cache.backend_id,
-            self._user_cache.language,
+        user = await self._backend_repository.update_user(
+            UserUpdate(id=self._user_cache.backend_id, language=self._user_cache.language),
         )
         assert user, f"Failed to assign language {self._user_cache.backend_id}:{self._user_cache.telegram_id} -> {language}"
         return self._create(HabitStates.end)

@@ -1,10 +1,11 @@
 import logging
+from .istatable import IStatable
 
 
 logger = logging.getLogger(__file__)
 
 
-class ISuspendableState:
+class ISuspendableState(IStatable):
     async def on_restore(self) -> None:
         logger.warning(f"{self.__class__.__name__}: on_restore")
 
