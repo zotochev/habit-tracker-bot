@@ -22,6 +22,7 @@ class UserCache:
     state_machine: StateMachine | None = None
     last_datetime: datetime | None = None
     messanger: Messenger | None = None
+    is_inited: bool = False
 
     def is_registered(self) -> bool:
         return self.backend_id is not None

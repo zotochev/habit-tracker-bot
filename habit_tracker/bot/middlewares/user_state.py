@@ -21,8 +21,8 @@ class UserStateMiddleware(BaseMiddleware):
             user_cache.messanger.register_recv_message(event.message_id)
 
         if user_cache is not None:
-            if not user_cache.is_registered():
-                await user_cache.state_machine.set_state(HabitStates.registration)
+            # if not user_cache.is_registered():
+            #     await user_cache.state_machine.set_state(HabitStates.registration)
 
             data["user_cache"] = user_cache
 

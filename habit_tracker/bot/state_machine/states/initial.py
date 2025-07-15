@@ -45,6 +45,7 @@ class InitState(IState):
         self._user_cache.backend_id = user.id
         self._user_cache.language = user.language
         self._user_cache.timezone = user.timezone
+        self._user_cache.is_inited = True
 
         return self._create(HabitStates.help_command)
 

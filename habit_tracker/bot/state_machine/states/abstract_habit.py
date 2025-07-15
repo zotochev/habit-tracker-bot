@@ -11,13 +11,13 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKe
 import dateparser
 
 from core import localizator
-from data.schemas import HabitBuffer
+from data.schemas import HabitBuffer, HabitRepeatType
 
 from bot.states import HabitStates
 from bot.state_machine.states_interfaces import IState
 from bot.state_machine.states_interfaces import ISuspendableState
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from bot.cache import UserCache
@@ -33,6 +33,9 @@ class HabitField(StrEnum):
     times_per_day = auto()
     start_date = auto()
     end_date = auto()
+    repeat_type = auto()
+    days_mask = auto()
+    notifications = auto()
 
 
 class FieldHandleError(Exception):
@@ -46,6 +49,10 @@ class AbstractHabitState(IState, ISuspendableState):
         HabitField.times_per_day,
         HabitField.start_date,
         HabitField.end_date,
+        HabitField.repeat_type,
+    )
+    callback_query_fields = (
+        HabitField.repeat_type,
     )
 
     HABIT_BUTTON_SUBMIT = 'habit_button_submit'
@@ -57,8 +64,6 @@ class AbstractHabitState(IState, ISuspendableState):
                  state_factory: dict[HabitStates, IState.__class__],
                  ) -> None:
         super().__init__(backend_repository, user_cache, state_factory)
-        # self._habit_message: Message | None = None
-
         self._current_field = HabitField.name
         last_date = user_cache.last_datetime.date() if user_cache.last_datetime else None
         self._habit = HabitBuffer(
@@ -68,16 +73,14 @@ class AbstractHabitState(IState, ISuspendableState):
             HabitField.name: self._handle_name,
             HabitField.start_date: self.__handle_date,
             HabitField.end_date: self.__handle_date,
-            HabitField.times_per_day: self.__handle_times_per_day
+            HabitField.times_per_day: self.__handle_times_per_day,
+            HabitField.repeat_type: self.__handle_repeat_type,
         }
         self.__last_error: str | None = None
 
-    async def _handle_message(self, message: Message) -> IState:
-        if self._habit.start_date is None:
-            self._habit.start_date = message.date.date()
-
+    async def __process_input(self, text: str) -> None:
         try:
-            field_data = self._fields_handlers.get(self._current_field, lambda x: x)(message.text)
+            field_data = self._fields_handlers.get(self._current_field, lambda x: x)(text)
             if inspect.iscoroutine(field_data):
                 field_data = await field_data
             setattr(self._habit, self._current_field, field_data)
@@ -90,6 +93,16 @@ class AbstractHabitState(IState, ISuspendableState):
         except Exception as e:
             logger.warning(f"{self.__class__.__name__}._handle_message {e.__class__.__name__}: {e}")
 
+    async def _handle_message(self, message: Message) -> IState:
+        if self._habit.start_date is None:
+            self._habit.start_date = message.date.date()
+        if self._current_field in self.callback_query_fields:
+            l = localizator.localizator
+            self.__last_error = l.lang(self._user_cache.language).habit_error_repeat_type_use_keyboard
+            await self.__update_habit_message()
+            return await self._handle()
+
+        await self.__process_input(message.text)
         return await self._handle()
 
     async def _handle_callback_query(self, callback_query: CallbackQuery) -> IState:
@@ -98,6 +111,9 @@ class AbstractHabitState(IState, ISuspendableState):
             return self._create(HabitStates.end)
         elif callback_query.data == self.HABIT_BUTTON_BACK:
             return self._create(HabitStates.end)
+        elif self._current_field in self.callback_query_fields:
+            await self.__process_input(callback_query.data)
+            await callback_query.answer()
         elif self._current_field != HabitField(callback_query.data):
             self._current_field = HabitField(callback_query.data)
             await self.__update_habit_message()
@@ -114,15 +130,6 @@ class AbstractHabitState(IState, ISuspendableState):
         return self
 
     async def on_enter(self) -> None:
-        """
-        New Habit
-
-        name: {}
-        description: {}
-        times per day: {}
-        start: {}
-        end: {}
-        """
         await super().on_enter()
         await self.__update_habit_message()
 
@@ -143,6 +150,8 @@ class AbstractHabitState(IState, ISuspendableState):
     def __set_next_state(self):
         if self._current_field != self.order[-1]:
             self._current_field = self.order[self.order.index(self._current_field) + 1]
+        else:
+            self._current_field = self.order[0]
 
     async def _handle_name(self, habit_name: str) -> str:
         habit = await self._backend_repository.get_habit_by_user_id_and_name(self._user_cache.backend_id, habit_name)
@@ -194,9 +203,18 @@ class AbstractHabitState(IState, ISuspendableState):
             HabitField.times_per_day: l.habit_field_times_per_day,
             HabitField.start_date: l.habit_field_start_date,
             HabitField.end_date: l.habit_field_end_date,
+            HabitField.repeat_type: l.habit_repeat_type,
+            HabitRepeatType.daily: l.habit_repeat_type_daily,
+            HabitRepeatType.weekly: l.habit_repeat_type_weekly,
+            HabitRepeatType.monthly: l.habit_repeat_type_monthly,
 
             self.HABIT_BUTTON_SUBMIT: self._get_submit_button_text(),
         }
+
+        def translate_value(key: HabitField, value: Any) -> Any:
+            if key == HabitField.repeat_type:
+                return translations[value]
+            return value
 
         text = self._get_message_header()
 
@@ -204,7 +222,7 @@ class AbstractHabitState(IState, ISuspendableState):
             "{}{}: {}".format(
                 '> ' if h == self._current_field else '',
                 translations[h],
-                getattr(self._habit, h) if getattr(self._habit, h, None) else '-'
+                translate_value(h, getattr(self._habit, h)) if getattr(self._habit, h, None) else '-'
             )
             for h in self.order
         )
@@ -212,33 +230,45 @@ class AbstractHabitState(IState, ISuspendableState):
             text += '\n'
             text += self.__dump_last_error()
 
-        reply_markup = InlineKeyboardMarkup(inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text=translations[habit_field],
-                    callback_data=habit_field,
-                ),
-            ] for habit_field in self.order
-        ])
+        reply_markup = InlineKeyboardMarkup(inline_keyboard=[])
 
-        if self._is_habit_ready():
+        if self._current_field not in self.callback_query_fields:
+            reply_markup.inline_keyboard = [
+                [
+                    InlineKeyboardButton(
+                        text=translations[habit_field],
+                        callback_data=habit_field,
+                    ),
+                ] for habit_field in self.order
+            ]
+
+            if self._is_habit_ready():
+                reply_markup.inline_keyboard.append(
+                    [
+                        InlineKeyboardButton(
+                            text=translations[self.HABIT_BUTTON_SUBMIT],
+                            callback_data=self.HABIT_BUTTON_SUBMIT,
+                        ),
+                    ]
+                )
+
             reply_markup.inline_keyboard.append(
                 [
                     InlineKeyboardButton(
-                        text=translations[self.HABIT_BUTTON_SUBMIT],
-                        callback_data=self.HABIT_BUTTON_SUBMIT,
+                        text=l.button_back,
+                        callback_data=self.HABIT_BUTTON_BACK,
                     ),
                 ]
             )
-
-        reply_markup.inline_keyboard.append(
-            [
-                InlineKeyboardButton(
-                    text=l.button_back,
-                    callback_data=self.HABIT_BUTTON_BACK,
-                ),
+        elif self._current_field == HabitField.repeat_type:
+            reply_markup.inline_keyboard = [
+                [
+                    InlineKeyboardButton(
+                        text=translations[habit_repeat_type],
+                        callback_data=str(habit_repeat_type.value),
+                    ),
+                ] for habit_repeat_type in HabitRepeatType
             ]
-        )
 
         return text, reply_markup
 
@@ -248,3 +278,13 @@ class AbstractHabitState(IState, ISuspendableState):
         formated_error = '{}: {}'.format(l.habit_error_header, self.__last_error)
         self.__last_error = None
         return formated_error
+
+    async def __handle_repeat_type(self, repeat_type: str) -> HabitRepeatType:
+        l = localizator.localizator.lang(self._user_cache.language)
+        try:
+            return HabitRepeatType(int(repeat_type))
+        except Exception as e:
+            logger.error(f"{self.__class__.__name__}.__handle_repeat_type({repeat_type}) -> {e.__class__.__name__}: {e}")
+            self.__last_error = l.habit_repeat_invalid_input
+            raise FieldHandleError()
+
