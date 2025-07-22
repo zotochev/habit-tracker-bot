@@ -34,18 +34,16 @@ class InitState(IState):
 
         # if there is no data on backend register user and ask for language
         if user is None:
-            # telegram_account = await self._backend_repository.register_user_by_telegram(
-            #     user_name=user_name,
-            #     telegram_id=user_id,
-            # )
-            # assert telegram_account, f"Failed to register user: {user_id}:{user_name}"
-            # self._user_cache.backend_id = telegram_account.id
             return self._create(HabitStates.registration)  #, user_id=user_id, user_name=user_name)
 
         self._user_cache.backend_id = user.id
         self._user_cache.language = user.language
         self._user_cache.timezone = user.timezone
         self._user_cache.is_inited = True
+
+        print("id", user.id)
+        print("language", user.language)
+        print("timezone", user.timezone)
 
         return self._create(HabitStates.help_command)
 

@@ -21,15 +21,17 @@ class UserStateMiddleware(BaseMiddleware):
             user_cache.messanger.register_recv_message(event.message_id)
 
         if user_cache is not None:
-            # if not user_cache.is_registered():
-            #     await user_cache.state_machine.set_state(HabitStates.registration)
+            if not user_cache.is_inited and (user := await self.__retrieve_user_data(user_cache.telegram_id)):
+                user_cache.backend_id = user.id
+                user_cache.language = user.language
+                user_cache.timezone = user.timezone
 
             data["user_cache"] = user_cache
 
         return await handler(event, data)
 
     @staticmethod
-    async def __retrieve_user_data(telegram_id: int, user_name: str) -> User:
+    async def __retrieve_user_data(telegram_id: int) -> User | None:
         repository = get_backend_repository()
 
         return await repository.get_user_info(telegram_id)
