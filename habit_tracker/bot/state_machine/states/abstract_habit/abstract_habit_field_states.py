@@ -6,6 +6,7 @@ import logging
 import datetime
 
 import dateparser
+from aiogram.types import InlineKeyboardButton
 
 from core import localizator
 from data.schemas import HabitBuffer, HabitRepeatType
@@ -47,6 +48,10 @@ class IFieldState(ABC):
     @abstractmethod
     def is_expected_input_type(self, input_type: FieldStateInputType) -> bool:
         ...
+
+    @staticmethod
+    def keyboard() -> list[InlineKeyboardButton] | None:
+        return None
 
 
 class NameFieldState(IFieldState):
@@ -138,17 +143,129 @@ class EndDateFieldState(DateFieldState):
 class RepeatTypeFieldState(IFieldState):
     field = HabitField.repeat_type
 
+    TYPE_STATE = 0
+    DAYS_STATE = 1
+
+    SUBMIT_CALLBACK_DATA = 'REPEAT_TYPE_FIELD_STATE_SUBMIT'
+
+    def __init__(
+            self,
+            habit_buffer: HabitBuffer,
+            backend_repository: BackendRepository,
+            user_cache: UserCache,
+    ) -> None:
+        super().__init__(habit_buffer, backend_repository, user_cache)
+        self.__state = self.TYPE_STATE
+
     async def handle(self, text: str) -> IFieldState:
         l = localizator.localizator.lang(self._user_cache.language)
+
+        if text == self.SUBMIT_CALLBACK_DATA:
+            return NameFieldState(self._habit_buffer, self._backend_repository, self._user_cache)
+
         try:
-            self._habit_buffer.repeat_type = HabitRepeatType(int(text))
+            match self.__state:
+                case self.TYPE_STATE:
+                    self._habit_buffer.repeat_type = HabitRepeatType(int(text))
+                    self.__state = self.DAYS_STATE
+                    if self._habit_buffer.repeat_type != HabitRepeatType.daily:
+                        return self
+                case self.DAYS_STATE:
+                    dummy_day = datetime.datetime.fromisoformat(text)
+                    if self._habit_buffer.is_day_set(dummy_day):
+                        self._habit_buffer.unset_day(dummy_day)
+                    else:
+                        self._habit_buffer.set_day(dummy_day)
+                    return self
+                case _:
+                    raise FieldHandleError(f"Unexpected Repeat Type state: {self.__state}")
         except Exception as e:
-            logger.error(f"{self.__class__.__name__}.__handle_repeat_type({text}) -> {e.__class__.__name__}: {e}")
+            logger.error(f"{self.__class__.__name__}.handle({text}) -> {e.__class__.__name__}: {e}")
             raise FieldHandleError(l.habit_repeat_invalid_input)
+
         return NameFieldState(self._habit_buffer, self._backend_repository, self._user_cache)
 
     def is_expected_input_type(self, input_type: FieldStateInputType) -> bool:
         return input_type in (FieldStateInputType.callback_query,)
+
+    def keyboard(self) -> list[list[InlineKeyboardButton]] | None:
+        l = localizator.localizator.lang(self._user_cache.language)
+
+        match self.__state:
+            case self.TYPE_STATE:
+                translations = {
+                    HabitRepeatType.daily: l.habit_repeat_type_daily,
+                    HabitRepeatType.weekly: l.habit_repeat_type_weekly,
+                    HabitRepeatType.monthly: l.habit_repeat_type_monthly,
+                }
+                return [
+                    [
+                        InlineKeyboardButton(
+                            text=translations[habit_repeat_type],
+                            callback_data=str(habit_repeat_type.value),
+                        ),
+                    ] for habit_repeat_type in HabitRepeatType
+                ]
+            case self.DAYS_STATE:
+                match self._habit_buffer.repeat_type:
+                    case HabitRepeatType.daily:
+                        raise FieldHandleError(f"Unexpected daily repeat type")
+                    case HabitRepeatType.weekly:
+                        keyboard = [[]]
+
+                        for i, day_name in enumerate((l.monday_short,
+                                                      l.tuesday_short,
+                                                      l.wednesday_short,
+                                                      l.thursday_short,
+                                                      l.friday_short,
+                                                      l.saturday_short,
+                                                      l.sunday_short)):
+                            dummy_day = datetime.date(1990, 4, 2) + datetime.timedelta(days=i)
+                            is_checked = self._habit_buffer.is_day_set(dummy_day)
+
+                            keyboard[0].append(
+                                InlineKeyboardButton(
+                                    text=f'{"✅" if is_checked else ""} {day_name}',
+                                    callback_data=dummy_day.isoformat(),
+                                )
+                            )
+
+                        keyboard.append(
+                            [
+                                InlineKeyboardButton(
+                                    text=l.button_next,
+                                    callback_data=self.SUBMIT_CALLBACK_DATA,
+                                )
+                            ]
+                        )
+                        return keyboard
+                    case HabitRepeatType.monthly:
+                        keyboard = [[] for _ in range(5)]  # 5 weeks in a month with 31 day
+
+                        for i in range(31):
+                            dummy_day = datetime.date(1990, 3, 1) + datetime.timedelta(days=i)
+                            is_checked = self._habit_buffer.is_day_set(dummy_day)
+
+                            keyboard[i // 7].append(
+                                InlineKeyboardButton(
+                                    text=f'{"✅" if is_checked else ""} {dummy_day.day}',
+                                    callback_data=dummy_day.isoformat(),
+                                )
+                            )
+
+                        keyboard.append(
+                            [
+                                InlineKeyboardButton(
+                                    text=l.button_next,
+                                    callback_data=self.SUBMIT_CALLBACK_DATA,
+                                )
+                            ]
+                        )
+                        return keyboard
+                    case _:
+                        raise FieldHandleError(f"Unexpected repeat type: {self._habit_buffer.repeat_type}")
+            case _:
+                raise FieldHandleError(f"Unexpected state: {self.__state}")
 
 
 field_states_factory = {

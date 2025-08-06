@@ -61,9 +61,18 @@ class Translations(BaseModel):
     progress_weekly_trend: str = '<PROGRESS_WEEKLY_TREND>'
     progress_taglines: list[str] = ['<PROGRESS_TAGLINE_0>']
     button_back: str = '<BUTTON_BACK>'
+    button_next: str = '<BUTTON_NEXT>'
     my_habits_edit_button: str = '<MY_HABITS_EDIT_BUTTON>'
     my_habits_delete_button: str = '<MY_HABITS_DELETE_BUTTON>'
     delete_are_you_sure_button: str = '<DELETE_ARE_YOU_SURE_BUTTON>'
     delete_habit_deleted: str = '<DELETE_HABIT_DELETED>'
     yes_button: str = '<YES_BUTTON>'
     no_button: str = '<NO_BUTTON>'
+    monday_short: str = '<MONDAY_SHORT>'
+    tuesday_short: str = '<TUESDAY_SHORT>'
+    wednesday_short: str = '<WEDNESDAY_SHORT>'
+    thursday_short: str = '<THURSDAY_SHORT>'
+    friday_short: str = '<FRIDAY_SHORT>'
+    saturday_short: str = '<SATURDAY_SHORT>'
+    sunday_short: str = '<SUNDAY_SHORT>'
+

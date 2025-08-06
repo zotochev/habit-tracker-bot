@@ -59,6 +59,7 @@ progress_taglines:
  - "Your consistency is paying off!"
  - "Small steps. Big changes."
 button_back: '⬅️ Back'
+button_next: '➡️ Next'
 my_habits_edit_button: '✏️ Edit'
 progress_total_habits: '🧩 Active habits'
 my_habits_delete_button: '🗑 Delete'
@@ -66,3 +67,10 @@ delete_are_you_sure_button: 'Are you sure you want to delete'
 delete_habit_deleted: 'Habit has been deleted'
 yes_button: '✅ Yes'
 no_button: '❌ No'
+monday_short: 'Mon'
+tuesday_short: 'Tue'
+wednesday_short: 'Wed'
+thursday_short: 'Thu'
+friday_short: 'Fri'
+saturday_short: 'Sat'
+sunday_short: 'Sun'

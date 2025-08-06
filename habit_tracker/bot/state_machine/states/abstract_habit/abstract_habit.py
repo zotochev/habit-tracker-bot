@@ -1,14 +1,10 @@
 from __future__ import annotations
 
-import inspect
-import datetime
-from abc import abstractmethod, ABC
-from enum import StrEnum, auto
+from abc import abstractmethod
 import logging
 
 from pydantic import ValidationError
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
-import dateparser
 
 from core import localizator
 from data.schemas import HabitBuffer, HabitRepeatType
@@ -22,11 +18,6 @@ from .abstract_habit_field_states import IFieldState
 from .exceptions import FieldHandleError
 from .abstract_habit_field_states import (
     NameFieldState,
-    DescriptionFieldState,
-    TimesPerDayFieldState,
-    StartDateFieldState,
-    EndDateFieldState,
-    RepeatTypeFieldState,
     field_states_factory,
     FieldStateInputType,
 )
@@ -68,6 +59,7 @@ class AbstractHabitState(IState, ISuspendableState):
             logger.warning(f"{self.__class__.__name__}._handle_message {e.__class__.__name__}: {e}")
         except Exception as e:
             logger.warning(f"{self.__class__.__name__}._handle_message {e.__class__.__name__}: {e}")
+            logger.exception(e)
 
     async def _handle_message(self, message: Message) -> IState:
         if self._habit.start_date is None:
@@ -177,8 +169,11 @@ class AbstractHabitState(IState, ISuspendableState):
             text += self.__dump_last_error()
 
         reply_markup = InlineKeyboardMarkup(inline_keyboard=[])
+        field_keyboard = self._current_field.keyboard()
 
-        if not self._current_field.is_expected_input_type(FieldStateInputType.callback_query):
+        if field_keyboard is not None:
+            reply_markup.inline_keyboard = field_keyboard
+        else:
             reply_markup.inline_keyboard = [
                 [
                     InlineKeyboardButton(
@@ -206,15 +201,6 @@ class AbstractHabitState(IState, ISuspendableState):
                     ),
                 ]
             )
-        elif self._current_field.field == HabitField.repeat_type:
-            reply_markup.inline_keyboard = [
-                [
-                    InlineKeyboardButton(
-                        text=translations[habit_repeat_type],
-                        callback_data=str(habit_repeat_type.value),
-                    ),
-                ] for habit_repeat_type in HabitRepeatType
-            ]
 
         return text, reply_markup
 

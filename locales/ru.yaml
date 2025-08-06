@@ -59,6 +59,7 @@ progress_taglines:
  - "Твоя стабильность даёт результат!"
  - "Маленькие шаги — большие перемены"
 button_back: '⬅️ Назад'
+button_next: '➡️ Дальше'
 my_habits_edit_button: '✏️ Изменить'
 progress_total_habits: '🧩 Активные привычки'
 my_habits_delete_button: '🗑 Удалить'
@@ -66,3 +67,10 @@ delete_are_you_sure_button: 'Вы уверены, что хотите удали
 delete_habit_deleted: 'Привычка удалена'
 yes_button: '✅ Да'
 no_button: '❌ Нет'
+monday_short: 'Пн'
+tuesday_short: 'Вт'
+wednesday_short: 'Ср'
+thursday_short: 'Чт'
+friday_short: 'Пт'
+saturday_short: 'Сб'
+sunday_short: 'Вс'
