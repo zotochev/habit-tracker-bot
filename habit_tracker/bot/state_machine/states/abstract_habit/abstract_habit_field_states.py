@@ -50,7 +50,7 @@ class IFieldState(ABC):
         ...
 
     @staticmethod
-    def keyboard() -> list[InlineKeyboardButton] | None:
+    def keyboard() -> list[list[InlineKeyboardButton]] | None:
         return None
 
 
@@ -161,7 +161,7 @@ class RepeatTypeFieldState(IFieldState):
         l = localizator.localizator.lang(self._user_cache.language)
 
         if text == self.SUBMIT_CALLBACK_DATA:
-            return NameFieldState(self._habit_buffer, self._backend_repository, self._user_cache)
+            return NotificationsFieldState(self._habit_buffer, self._backend_repository, self._user_cache)
 
         try:
             match self.__state:
@@ -183,7 +183,7 @@ class RepeatTypeFieldState(IFieldState):
             logger.error(f"{self.__class__.__name__}.handle({text}) -> {e.__class__.__name__}: {e}")
             raise FieldHandleError(l.habit_repeat_invalid_input)
 
-        return NameFieldState(self._habit_buffer, self._backend_repository, self._user_cache)
+        return NotificationsFieldState(self._habit_buffer, self._backend_repository, self._user_cache)
 
     def is_expected_input_type(self, input_type: FieldStateInputType) -> bool:
         return input_type in (FieldStateInputType.callback_query,)
@@ -268,6 +268,64 @@ class RepeatTypeFieldState(IFieldState):
                 raise FieldHandleError(f"Unexpected state: {self.__state}")
 
 
+class NotificationsFieldState(IFieldState):
+    field = HabitField.notifications
+    SUBMIT_CALLBACK_DATA = 'NOTIFICATION_FIELD_STATE_SUBMIT'
+    DELETE_PREFIX = 'delete'
+
+    async def handle(self, text: str) -> IFieldState:
+        if self._habit_buffer.notifications is None:
+            self._habit_buffer.notifications = []
+
+        if text == self.SUBMIT_CALLBACK_DATA:
+            return NameFieldState(self._habit_buffer, self._backend_repository, self._user_cache)
+
+        try:
+            to_delete = False
+            if text.startswith(self.DELETE_PREFIX):
+                to_delete = True
+                text = text.lstrip(self.DELETE_PREFIX)
+            notification = datetime.time.fromisoformat(text)
+            if to_delete:
+                self._habit_buffer.notifications.remove(notification)
+            else:
+                self._habit_buffer.notifications.append(notification)
+            self._habit_buffer.notifications.sort()
+        except Exception as e:
+            logger.exception(e)
+            raise FieldHandleError(f"Could not deduct time from '{text}'")
+
+        return self
+
+    def is_expected_input_type(self, input_type: FieldStateInputType) -> bool:
+        return input_type in (FieldStateInputType.message, FieldStateInputType.callback_query)
+
+    def keyboard(self) -> list[list[InlineKeyboardButton]] | None:
+        l = localizator.localizator.lang(self._user_cache.language)
+        keyboard = []
+
+        if self._habit_buffer.notifications:
+            for notification in self._habit_buffer.notifications:
+                keyboard.append(
+                    [
+                        InlineKeyboardButton(
+                            text=f'🗑 {notification.strftime("%H:%M")}',
+                            callback_data=f'{self.DELETE_PREFIX}{notification}',
+                        )
+                    ]
+                )
+
+        keyboard.append(
+            [
+                InlineKeyboardButton(
+                    text=l.button_next,
+                    callback_data=self.SUBMIT_CALLBACK_DATA,
+                )
+            ]
+        )
+        return keyboard
+
+
 field_states_factory = {
     s.field: s
     for s in (
@@ -277,5 +335,6 @@ field_states_factory = {
         StartDateFieldState,
         EndDateFieldState,
         RepeatTypeFieldState,
+        NotificationsFieldState,
     )
 }

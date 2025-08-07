@@ -142,6 +142,8 @@ class AbstractHabitState(IState, ISuspendableState):
             HabitField.start_date: l.habit_field_start_date,
             HabitField.end_date: l.habit_field_end_date,
             HabitField.repeat_type: l.habit_repeat_type,
+            HabitField.notifications: l.habit_field_notifications,
+
             HabitRepeatType.daily: l.habit_repeat_type_daily,
             HabitRepeatType.weekly: l.habit_repeat_type_weekly,
             HabitRepeatType.monthly: l.habit_repeat_type_monthly,
@@ -152,6 +154,11 @@ class AbstractHabitState(IState, ISuspendableState):
         def translate_value(key: HabitField, value: Any) -> Any:
             if key == HabitField.repeat_type:
                 return translations[value]
+            elif key == HabitField.notifications:
+                if value:
+                    return ", ".join(t.strftime("%H:%M") for t in value)
+                else:
+                    '-'
             return value
 
         text = self._get_message_header()
@@ -211,11 +218,11 @@ class AbstractHabitState(IState, ISuspendableState):
         self.__last_error = None
         return formated_error
 
-    async def __handle_repeat_type(self, repeat_type: str) -> HabitRepeatType:
-        l = localizator.localizator.lang(self._user_cache.language)
-        try:
-            return HabitRepeatType(int(repeat_type))
-        except Exception as e:
-            logger.error(f"{self.__class__.__name__}.__handle_repeat_type({repeat_type}) -> {e.__class__.__name__}: {e}")
-            self.__last_error = l.habit_repeat_invalid_input
-            raise FieldHandleError()
+    # async def __handle_repeat_type(self, repeat_type: str) -> HabitRepeatType:
+    #     l = localizator.localizator.lang(self._user_cache.language)
+    #     try:
+    #         return HabitRepeatType(int(repeat_type))
+    #     except Exception as e:
+    #         logger.error(f"{self.__class__.__name__}.__handle_repeat_type({repeat_type}) -> {e.__class__.__name__}: {e}")
+    #         self.__last_error = l.habit_repeat_invalid_input
+    #         raise FieldHandleError()

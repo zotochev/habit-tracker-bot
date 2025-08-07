@@ -28,6 +28,7 @@ class Translations(BaseModel):
     habit_field_start_date: str = '<HABIT_FIELD_START_DATE>'
     habit_field_end_date: str = '<HABIT_FIELD_END_DATE>'
     habit_repeat_type: str = '<HABIT_FIELD_REPEAT_TYPE>'
+    habit_field_notifications: str = '<HABIT_FIELD_NOTIFICATIONS>'
     habit_repeat_type_daily: str = '<HABIT_FIELD_REPEAT_TYPE_DAILY>'
     habit_repeat_type_weekly: str = '<HABIT_FIELD_REPEAT_TYPE_WEEKLY>'
     habit_repeat_type_monthly: str = '<HABIT_FIELD_REPEAT_TYPE_MONTHLY>'
