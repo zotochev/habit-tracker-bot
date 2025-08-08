@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from data.repositories.backend_repository.backend_repository import BackendRepository
 
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 class FieldStateInputType(Enum):

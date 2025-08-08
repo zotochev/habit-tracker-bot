@@ -5,7 +5,7 @@ from aiogram.enums import ContentType
 from .icontext_type_handable import IContextTypeHandable
 
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 class ITextHandable(IContextTypeHandable):

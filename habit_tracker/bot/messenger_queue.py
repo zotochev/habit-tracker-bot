@@ -7,7 +7,7 @@ from collections.abc import Callable, Coroutine
 from bot.messenger import Messenger
 
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 class MessengerQueue:
