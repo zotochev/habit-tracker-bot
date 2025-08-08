@@ -1,6 +1,7 @@
 import asyncio
 
 from bot.bot import run_bot
+from bot.notificator import setup_notificator
 from web.http_server import run_http
 
 from core.localizator.load_locales import setup_localizator
@@ -13,11 +14,13 @@ async def main():
     setup_localizator(LOCALES_DIRECTORY)
     messenger_queue = setup_messenger_queue()
     setup_cache(messenger_queue)
+    notificator = setup_notificator(messenger_queue)
 
     await asyncio.gather(
         run_http(),
         run_bot(),
         messenger_queue.process_messages(),
+        notificator.process_notifications(),
     )
 
 

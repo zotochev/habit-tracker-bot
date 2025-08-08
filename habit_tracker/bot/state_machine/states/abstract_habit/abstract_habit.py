@@ -46,6 +46,7 @@ class AbstractHabitState(IState, ISuspendableState):
         super().__init__(backend_repository, user_cache, state_factory)
         last_date = user_cache.last_datetime.date() if user_cache.last_datetime else None
         self._habit = HabitBuffer(start_date=last_date)
+        self._habit.repeat_type = HabitRepeatType.daily
         self._current_field: IFieldState = NameFieldState(self._habit, self._backend_repository, self._user_cache)
         self.__last_error: str | None = None
 

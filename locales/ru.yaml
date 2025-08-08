@@ -75,3 +75,4 @@ thursday_short: 'Чт'
 friday_short: 'Пт'
 saturday_short: 'Сб'
 sunday_short: 'Вс'
+notification: "🔔 Сейчас {time} — время для привычки: {name}!"

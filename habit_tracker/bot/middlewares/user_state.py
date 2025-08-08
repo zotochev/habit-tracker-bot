@@ -2,7 +2,6 @@ from aiogram.dispatcher.middlewares.base import BaseMiddleware
 from aiogram.types import CallbackQuery, Message
 
 from bot import cache
-from bot.states import HabitStates
 from data.factory import get_backend_repository
 from data.schemas import User
 
@@ -21,10 +20,8 @@ class UserStateMiddleware(BaseMiddleware):
             user_cache.messenger.register_recv_message(event.message_id)
 
         if user_cache is not None:
-            if not user_cache.is_inited and (user := await self.__retrieve_user_data(user_cache.telegram_id)):
-                user_cache.backend_id = user.id
-                user_cache.language = user.language
-                user_cache.timezone = user.timezone
+            if not user_cache.is_inited and (await self.__retrieve_user_data(user_cache.telegram_id)):
+                await cache.cache.setup_user(user_cache.telegram_id)
 
             data["user_cache"] = user_cache
 

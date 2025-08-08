@@ -6,7 +6,7 @@ from itertools import chain
 from collections import deque
 
 from aiogram.types import Message
-from aiogram.exceptions import TelegramBadRequest, TelegramNotFound, TelegramAPIError
+from aiogram.exceptions import TelegramAPIError
 
 import bot
 
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from aiogram.types import InlineKeyboardMarkup
 
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 class Messenger:
@@ -69,7 +69,7 @@ class Messenger:
                         self.__sent_messages_ids.append(self.__main_message_id)
                     self.__main_message_id = None
 
-                    await self.__send_message(text, reply_markup)
+                    await self.send_message(text, reply_markup)
                 case 'Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message':
                     pass
 
@@ -84,7 +84,7 @@ class Messenger:
             reply_markup=reply_markup,
         )
 
-    async def __send_message(self, text: str, reply_markup: InlineKeyboardMarkup | None = None) -> Message:
+    async def send_message(self, text: str, reply_markup: InlineKeyboardMarkup | None = None) -> Message:
         message = await bot.bot_instance.send_message(
             chat_id=self.__telegram_id,
             text=text,

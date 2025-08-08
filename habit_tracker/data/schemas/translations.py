@@ -76,4 +76,4 @@ class Translations(BaseModel):
     friday_short: str = '<FRIDAY_SHORT>'
     saturday_short: str = '<SATURDAY_SHORT>'
     sunday_short: str = '<SUNDAY_SHORT>'
-
+    notification: str = '<NOTIFICATION: {time}: {name}>'

@@ -75,3 +75,4 @@ thursday_short: 'Thu'
 friday_short: 'Fri'
 saturday_short: 'Sat'
 sunday_short: 'Sun'
+notification: "🔔 It's {time} – time for your habit: {name}!"

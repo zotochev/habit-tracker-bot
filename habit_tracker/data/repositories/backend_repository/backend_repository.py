@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, time, datetime
 
 from data.schemas.habit_event import HabitStatistics
 from data.services.backend_service.backend_service import BackendService
@@ -10,6 +10,7 @@ from data.schemas import (
     HabitUpdate,
     CommonProgress,
     UserUpdate,
+    HabitNotification,
 )
 
 
@@ -19,6 +20,9 @@ class BackendRepository:
 
     async def get_user_info(self, telegram_id: int) -> User | None:
         return await self._service.get_user_by_telegram(telegram_id)
+
+    async def get_user(self, user_id: int) -> User | None:
+        return await self._service.get_user(user_id)
 
     async def register_user_by_telegram(self, user_name: str, telegram_id: int) -> User | None:
         return await self._service.register_user_by_telegram(user_name, telegram_id)
@@ -52,3 +56,6 @@ class BackendRepository:
 
     async def delete_habit(self, user_id: int, habit_id: int) -> None:
         return await self._service.delete_habit(user_id, habit_id)
+
+    async def get_notifications_for_period(self, now: datetime, period: int) -> list[HabitNotification]:
+        return await self._service.get_notifications_for_period(now, period)

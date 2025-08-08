@@ -44,6 +44,6 @@ class UserUpdate(UserBase):
 
 class User(UserBase):
     id: int
-    telegram_id: Optional[int] = None
+    telegram_account: TelegramAccount | None = None
 
     model_config = ConfigDict(from_attributes=True)

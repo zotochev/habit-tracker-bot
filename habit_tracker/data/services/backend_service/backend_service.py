@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from fastapi.encoders import jsonable_encoder
 
@@ -12,6 +12,7 @@ from data.schemas import (
     HabitCreate,
     HabitEvent,
     HabitUpdate,
+    HabitNotification,
     HabitStatistics,
     CommonProgress,
 )
@@ -26,6 +27,17 @@ class BackendService:
         r: Response = await self._requester.post(
             "v1/auth/signup-telegram",
             body={'name': user_name, 'telegram_id': telegram_id},
+        )
+
+        if not r.ok():
+            return
+
+        return User(**r.body)
+
+    async def get_user(self, user_id: int) -> User | None:
+        r: Response = await self._requester.get(
+            "v1/users",
+            query={'user_id': user_id},
         )
 
         if not r.ok():
@@ -137,3 +149,14 @@ class BackendService:
             return
 
         return
+
+    async def get_notifications_for_period(self, now: datetime, period: int) -> list[HabitNotification] | None:
+        r: Response = await self._requester.get(
+            f"v1/habits/notifications/all",
+            query=jsonable_encoder({'now': now, 'period': period}),
+        )
+
+        if not r.ok():
+            return
+
+        return [HabitNotification(**h) for h in r.body]

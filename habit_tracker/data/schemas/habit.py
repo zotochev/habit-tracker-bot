@@ -95,3 +95,12 @@ class HabitBuffer(BaseModel, HabitRepeatTypeMixin):
     notifications: list[time] | None = None
 
     model_config = ConfigDict(validate_assignment=True)
+
+
+class HabitNotification(BaseModel):
+    id: int
+    user_id: int
+    name: str
+    notifications: list[time]
+
+    model_config = ConfigDict(from_attributes=True)
