@@ -18,7 +18,7 @@ class UserStateMiddleware(BaseMiddleware):
         elif isinstance(event, Message):
             user_cache = cache.cache.user(event.chat.id)
             user_cache.last_datetime = event.date
-            user_cache.messanger.register_recv_message(event.message_id)
+            user_cache.messenger.register_recv_message(event.message_id)
 
         if user_cache is not None:
             if not user_cache.is_inited and (user := await self.__retrieve_user_data(user_cache.telegram_id)):

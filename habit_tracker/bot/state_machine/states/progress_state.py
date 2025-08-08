@@ -44,7 +44,7 @@ class ProgressState(IState):
         await super().on_enter()
         text = await self.__create_text()
 
-        await self._user_cache.messanger.update_main_message(text)
+        await self._user_cache.messenger.update_main_message(text)
 
     async def on_exit(self) -> None:
         await super().on_enter()

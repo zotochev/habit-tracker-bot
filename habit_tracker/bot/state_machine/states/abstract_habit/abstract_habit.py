@@ -120,7 +120,7 @@ class AbstractHabitState(IState, ISuspendableState):
     async def __update_habit_message(self):
         self.__update_start_habit_time()
         text, reply_markup = self.__create_habit_message()
-        await self._user_cache.messanger.update_main_message(text, reply_markup)
+        await self._user_cache.messenger.update_main_message(text, reply_markup)
 
     def __update_start_habit_time(self) -> None:
         if (

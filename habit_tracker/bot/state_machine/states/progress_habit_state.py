@@ -43,7 +43,7 @@ class ProgressHabitState(IState):
         text = await self.__create_text()
         keyboard = self.__create_keyboard()
 
-        await self._user_cache.messanger.update_main_message(text, keyboard)
+        await self._user_cache.messenger.update_main_message(text, keyboard)
 
     async def _handle_message(self, message: Message) -> IState:
         return await self._handle()

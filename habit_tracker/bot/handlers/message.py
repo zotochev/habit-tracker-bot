@@ -39,4 +39,4 @@ async def habit_name(message: Message, user_cache: UserCache):
         await bot.bot_instance.leave_chat(message.chat.id)
 
     await user_cache.state_machine.handle(message)
-    await user_cache.messanger.remove_temp_messages()
+    await user_cache.messenger.remove_temp_messages()

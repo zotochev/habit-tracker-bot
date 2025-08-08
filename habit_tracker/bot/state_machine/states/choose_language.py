@@ -71,7 +71,7 @@ class ChooseLanguage(IState):
         ])
         text = '\n'.join(l.lang(lang).menu_choose_language for lang in LanguageEnum.all())
 
-        await self._user_cache.messanger.update_main_message(text, keyboard)
+        await self._user_cache.messenger.update_main_message(text, keyboard)
 
     async def on_exit(self) -> None:
         await super().on_exit()

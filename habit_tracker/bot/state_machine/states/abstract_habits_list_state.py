@@ -70,7 +70,7 @@ class AbstractHabitsListState(IState, ISuspendableState):
         text = self._format_habits_message()
         keyboard = self._construct_keyboard()
 
-        await self._user_cache.messanger.update_main_message(text, keyboard)
+        await self._user_cache.messenger.update_main_message(text, keyboard)
 
     @abstractmethod
     async def _process_habit_button_callback(self, callback_query: CallbackQuery) -> None:

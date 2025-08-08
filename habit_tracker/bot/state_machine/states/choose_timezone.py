@@ -174,4 +174,4 @@ class ChoseTimezoneState(IState, IImmediateHandle):  # fixme: remove IImmediateH
     async def __update_message(self):
         text = self.__generate_text()
         keyboard = self.__generate_keyboard()
-        await self._user_cache.messanger.update_main_message(text, keyboard)
+        await self._user_cache.messenger.update_main_message(text, keyboard)

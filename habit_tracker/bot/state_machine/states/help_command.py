@@ -33,4 +33,4 @@ class HelpCommand(IState):
     async def on_enter(self) -> None:
         await super().on_enter()
         l = localizator.localizator.lang(self._user_cache.language)
-        await self._user_cache.messanger.update_main_message(l.menu_help)
+        await self._user_cache.messenger.update_main_message(l.menu_help)

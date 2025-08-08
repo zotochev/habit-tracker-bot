@@ -58,7 +58,7 @@ class DeleteState(IState):
         text = self.__get_message_text()
         keyboard = self.__get_message_keyboard()
 
-        await self._user_cache.messanger.update_main_message(text, keyboard)
+        await self._user_cache.messenger.update_main_message(text, keyboard)
 
     async def __retrieve_habit(self) -> HabitUpdate:
         return await self._backend_repository.get_habit_by_user_id_and_id(self._user_cache.backend_id, self._habit_id)
