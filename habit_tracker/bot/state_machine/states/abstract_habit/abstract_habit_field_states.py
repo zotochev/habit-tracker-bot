@@ -10,6 +10,7 @@ from aiogram.types import InlineKeyboardButton
 
 from core import localizator
 from data.schemas import HabitBuffer, HabitRepeatType
+from core.timezone_utils import utc_to_local, local_to_utc
 
 from .habit_field_enum import HabitField
 from .exceptions import FieldHandleError
@@ -285,7 +286,10 @@ class NotificationsFieldState(IFieldState):
             if text.startswith(self.DELETE_PREFIX):
                 to_delete = True
                 text = text.lstrip(self.DELETE_PREFIX)
+
             notification = datetime.time.fromisoformat(text)
+            notification = local_to_utc(notification, self._user_cache.timezone)
+
             if to_delete:
                 self._habit_buffer.notifications.remove(notification)
             else:
@@ -306,6 +310,8 @@ class NotificationsFieldState(IFieldState):
 
         if self._habit_buffer.notifications:
             for notification in self._habit_buffer.notifications:
+                notification = utc_to_local(notification, self._user_cache.timezone)
+
                 keyboard.append(
                     [
                         InlineKeyboardButton(

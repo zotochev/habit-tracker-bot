@@ -7,6 +7,7 @@ from pydantic import ValidationError
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 
 from core import localizator
+from core.timezone_utils import utc_to_local
 from data.schemas import HabitBuffer, HabitRepeatType
 
 from bot.states import HabitStates
@@ -156,7 +157,7 @@ class AbstractHabitState(IState, ISuspendableState):
                 return translations[value]
             elif key == HabitField.notifications:
                 if value:
-                    return ", ".join(t.strftime("%H:%M") for t in value)
+                    return ", ".join(utc_to_local(t, self._user_cache.timezone).strftime("%H:%M") for t in value)
                 else:
                     '-'
             return value
@@ -217,12 +218,3 @@ class AbstractHabitState(IState, ISuspendableState):
         formated_error = '{}: {}'.format(l.habit_error_header, self.__last_error)
         self.__last_error = None
         return formated_error
-
-    # async def __handle_repeat_type(self, repeat_type: str) -> HabitRepeatType:
-    #     l = localizator.localizator.lang(self._user_cache.language)
-    #     try:
-    #         return HabitRepeatType(int(repeat_type))
-    #     except Exception as e:
-    #         logger.error(f"{self.__class__.__name__}.__handle_repeat_type({repeat_type}) -> {e.__class__.__name__}: {e}")
-    #         self.__last_error = l.habit_repeat_invalid_input
-    #         raise FieldHandleError()
