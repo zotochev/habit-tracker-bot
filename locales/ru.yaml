@@ -29,7 +29,7 @@ habit_repeat_type_daily: 'Ежедневная'
 habit_repeat_type_weekly: 'Недельная'
 habit_repeat_type_monthly: 'Месячная'
 habit_repeat_invalid_input: 'Некорректная периодичность привычки'
-habit_button_submit: '> Создать привычку <'
+habit_button_submit: '➕ Создать привычку'
 habit_error_name_already_in_use: 'Имя привычки уже занято'
 habit_error_repeat_type_use_keyboard: 'Используйте кнопки под сообщением чтобы выбрать периодичность привычки'
 habit_error_date: 'Некорректный формат даты'
@@ -76,6 +76,10 @@ friday_short: 'Пт'
 saturday_short: 'Сб'
 sunday_short: 'Вс'
 notification: "🔔 Сейчас {time} — время для привычки: {name}!"
-timezone_current: "🕒 Текущий временной пояс"
+timezone_current: "🕒 Текущий часовой пояс"
 timezone_local_time: "🗓️ Местное время"
 timezone_offset: "🌐 UTC"
+timezone_no_timezones: 'Не нашлось ни одного часового пояса.'
+timezone_too_many_timezones: 'Найдено слишком много часовых поясов {num_zones}, для запроса "{text}"'
+timezone_updated_to: 'Часовой пояс обновлен: {timezone}'
+timezone_not_found: 'Часовой пояс "{text}" не найден'

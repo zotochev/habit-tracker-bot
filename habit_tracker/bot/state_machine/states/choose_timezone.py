@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 @register_state(HabitStates.choose_timezone)
 class ChoseTimezoneState(IState, IImmediateHandle):  # fixme: remove IImmediateHandle probably no need
     MAX_ZONES_BUTTONS = 10
-    CONFIRM_CALLBACK_DATA = 'confirm'
+    CONFIRM_CALLBACK_DATA = 'confirm_timezone'
 
     def __init__(self,
                  backend_repository: BackendRepository,
@@ -50,36 +50,37 @@ class ChoseTimezoneState(IState, IImmediateHandle):  # fixme: remove IImmediateH
 
     async def _handle_message(self, message: Message) -> IState:
         zones = [zone for zone in available_timezones() if message.text.lower().strip() in zone.lower()]
-        print(zones)
+        l = localizator.localizator.lang(self._user_cache.language)
 
         match len(zones):
             case 0:
-                self._message = 'No time zones found. Not updated'
+                self._message = l.timezone_no_timezones
             case 1:
                 self._current_timezone = ZoneInfo(zones[0])
             case number_of_zones if number_of_zones <= self.MAX_ZONES_BUTTONS:
                 self._found_zones = zones
             case _:
-                self._message = f'Too many timezones found: {len(zones)} for string "{message.text}"'
+                self._message = l.timezone_too_many_timezones.format(num_zones=len(zones), text=message.text)
 
         return await self._handle(message.text)
 
     async def _handle_callback_query(self, callback_query: CallbackQuery) -> IState:
         message_text = callback_query.data
+        l = localizator.localizator.lang(self._user_cache.language)
 
         try:
             if message_text == self.CONFIRM_CALLBACK_DATA:
                 await self._backend_repository.update_user(
                     UserUpdate(id=self._user_cache.backend_id, timezone=self._current_timezone.key),
                 )
-                await callback_query.answer(f'Time zone updated to {self._current_timezone.key}')
+                await callback_query.answer(l.timezone_updated_to.format(timezone=self._current_timezone.key))
                 return self._create(HabitStates.end)
             else:
                 self._current_timezone = ZoneInfo(message_text)
                 await callback_query.answer()
         except ZoneInfoNotFoundError as e:
             logger.error(f"{self.__class__.__name__}: {e.__class__.__name__}: {e}")
-            await callback_query.answer(f'Time zone {message_text} not found')
+            await callback_query.answer(l.timezone_not_found.format(text=message_text))
 
         return await self._handle(message_text)
 

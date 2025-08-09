@@ -80,3 +80,7 @@ class Translations(BaseModel):
     timezone_current: str = "<TIMEZONE_CURRENT>"
     timezone_local_time: str = "<TIMEZONE_LOCAL_TIME>"
     timezone_offset: str = "<TIMEZONE_OFFSET>"
+    timezone_no_timezones: str = '<TIMEZONE_NO_TIMEZONES>'
+    timezone_too_many_timezones: str = '<TIMEZONE_TOO_MANY_TIMEZONES {num_zones} "{text}">'
+    timezone_updated_to: str = '<TIMEZONE_UPDATED_TO {timezone}>'
+    timezone_not_found: str = '<TIMEZONE_NOT_FOUND {text}>'
