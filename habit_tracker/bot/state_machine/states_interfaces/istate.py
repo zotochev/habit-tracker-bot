@@ -5,7 +5,7 @@ import logging
 from aiogram.types import Message, CallbackQuery
 
 from bot.states import HabitStates
-from .Itext_handable import ITextHandable
+from .itext_handable import ITextHandable
 from .istatable import IStatable
 
 from typing import TYPE_CHECKING
