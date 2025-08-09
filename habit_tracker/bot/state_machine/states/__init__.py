@@ -10,4 +10,4 @@ from .progress_habit_state import ProgressHabitState
 from .help_command import HelpCommand
 from .delete_habit import DeleteState
 from .registration_state import RegistrationState
-from .choose_timezone import ChoseTimezoneState
+from .choose_timezone import ChooseTimezoneState

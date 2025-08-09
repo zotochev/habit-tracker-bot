@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 @register_state(HabitStates.choose_timezone)
-class ChoseTimezoneState(IState):
+class ChooseTimezoneState(IState):
     MAX_ZONES_BUTTONS = 10
     CONFIRM_CALLBACK_DATA = 'confirm_timezone'
 
