@@ -4,7 +4,7 @@ from asyncio.exceptions import CancelledError
 from aiohttp import web
 
 from aiogram import Bot, Dispatcher
-from aiogram.types import InputFile
+from aiogram.types.input_file import InputFile
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 
 import config
