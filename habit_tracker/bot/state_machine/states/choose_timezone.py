@@ -126,9 +126,9 @@ class ChoseTimezoneState(IState, IImmediateHandle):  # fixme: remove IImmediateH
         offset_str = self.__get_offset_from_zone_name(self._current_timezone.key)
 
         text = (
-            f"🕒 Your current timezone: {self._current_timezone.key}\n"
-            f"🗓️ Local time: {now.strftime('%Y-%m-%d %H:%M')}\n"
-            f"🌐 UTC offset: {offset_str}"
+            f"{l.timezone_current}: {self._current_timezone.key}\n"
+            f"{l.timezone_local_time}: {now.strftime('%Y-%m-%d %H:%M')}\n"
+            f"{l.timezone_offset}: {offset_str}"
         )
 
         if self._message:

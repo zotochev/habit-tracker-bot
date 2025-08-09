@@ -76,3 +76,6 @@ friday_short: 'Fri'
 saturday_short: 'Sat'
 sunday_short: 'Sun'
 notification: "🔔 It's {time} – time for your habit: {name}!"
+timezone_current: "🕒 Your current timezone"
+timezone_local_time: "🗓️ Local time"
+timezone_offset: "🌐 UTC offset"

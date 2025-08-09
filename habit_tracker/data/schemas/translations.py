@@ -77,3 +77,6 @@ class Translations(BaseModel):
     saturday_short: str = '<SATURDAY_SHORT>'
     sunday_short: str = '<SUNDAY_SHORT>'
     notification: str = '<NOTIFICATION: {time}: {name}>'
+    timezone_current: str = "<TIMEZONE_CURRENT>"
+    timezone_local_time: str = "<TIMEZONE_LOCAL_TIME>"
+    timezone_offset: str = "<TIMEZONE_OFFSET>"

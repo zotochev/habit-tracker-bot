@@ -76,3 +76,6 @@ friday_short: 'Пт'
 saturday_short: 'Сб'
 sunday_short: 'Вс'
 notification: "🔔 Сейчас {time} — время для привычки: {name}!"
+timezone_current: "🕒 Текущий временной пояс"
+timezone_local_time: "🗓️ Местное время"
+timezone_offset: "🌐 UTC"
