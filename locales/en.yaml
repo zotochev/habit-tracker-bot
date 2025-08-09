@@ -86,3 +86,16 @@ timezone_too_many_timezones: 'Too many timezones found {num_zones}, for request 
 timezone_updated_to: 'Time zone updated to {timezone}'
 timezone_not_found: 'Time zone {text} not found'
 button_confirm: 'Confirm'
+months:
+ - "January"
+ - "February"
+ - "March"
+ - "April"
+ - "May"
+ - "June"
+ - "July"
+ - "August"
+ - "September"
+ - "October"
+ - "November"
+ - "December"

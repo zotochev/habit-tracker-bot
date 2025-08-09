@@ -87,3 +87,17 @@ class Translations(BaseModel):
     timezone_updated_to: str = '<TIMEZONE_UPDATED_TO {timezone}>'
     timezone_not_found: str = '<TIMEZONE_NOT_FOUND {text}>'
     button_confirm: str = '<CONFIRM>'
+    months: list[str] = [
+        "<JANUARY>",
+        "<FEBRUARY>",
+        "<MARCH>",
+        "<APRIL>",
+        "<MAY>",
+        "<JUNE>",
+        "<JULY>",
+        "<AUGUST>",
+        "<SEPTEMBER>",
+        "<OCTOBER>",
+        "<NOVEMBER>",
+        "<DECEMBER>",
+    ]

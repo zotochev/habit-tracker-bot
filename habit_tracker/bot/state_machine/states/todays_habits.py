@@ -6,7 +6,6 @@ from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardBut
 from bot.state_machine.states_factory import register_state
 from bot.states import HabitStates
 from core import localizator
-from config import MONTHS
 
 from .abstract_habits_list_state import AbstractHabitsListState
 
@@ -37,7 +36,7 @@ class TodaysHabitsState(AbstractHabitsListState):
         l = localizator.localizator.lang(self._user_cache.language)
 
         text = ''
-        text += f'📅 {l.habit_list_header} — {MONTHS[self._user_cache.language][self._user_cache.last_datetime.month]} {self._user_cache.last_datetime.day}\n'
+        text += f'📅 {l.habit_list_header} — {l.months[self._user_cache.last_datetime.month]} {self._user_cache.last_datetime.day}\n'
         text += f'{l.habit_list_tagline}\n'
         text += f'{l.habit_list_page}: [{self._page_current}/{self._pages_total}]\n'
         text += '\n'
