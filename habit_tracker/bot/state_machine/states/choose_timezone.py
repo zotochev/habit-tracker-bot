@@ -151,6 +151,7 @@ class ChoseTimezoneState(IState, IImmediateHandle):  # fixme: remove IImmediateH
 
     def __generate_keyboard(self):
         l = localizator.localizator.lang(self._user_cache.language)
+
         if self._found_zones:
             keyboard = InlineKeyboardMarkup(inline_keyboard=[])
             for zone_name in self._found_zones:
@@ -165,7 +166,7 @@ class ChoseTimezoneState(IState, IImmediateHandle):  # fixme: remove IImmediateH
         else:
             keyboard = InlineKeyboardMarkup(inline_keyboard=[[
                 InlineKeyboardButton(
-                    text=f'Confirm',
+                    text=l.button_confirm,
                     callback_data=self.CONFIRM_CALLBACK_DATA,
                 ),
             ]])

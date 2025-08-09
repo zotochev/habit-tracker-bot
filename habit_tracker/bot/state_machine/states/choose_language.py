@@ -3,6 +3,8 @@ import logging
 
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 
+import bot
+from bot.menu import setup_menu
 from bot.states import HabitStates
 from data.schemas import UserUpdate
 from data.schemas.user import LanguageEnum
@@ -49,7 +51,7 @@ class ChooseLanguage(IState):
         try:
             language = LanguageEnum(message_text)
         except Exception as e:
-            print(f"Not a valid language: {message_text}")
+            logger.warning(f"Not a valid language: {message_text}")
             return self
 
         self._user_cache.language = language
@@ -75,3 +77,5 @@ class ChooseLanguage(IState):
 
     async def on_exit(self) -> None:
         await super().on_exit()
+        language = self._user_cache.language or LanguageEnum.en
+        await setup_menu(language, bot.bot_instance)

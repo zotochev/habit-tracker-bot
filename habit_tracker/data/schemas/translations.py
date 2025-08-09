@@ -84,3 +84,4 @@ class Translations(BaseModel):
     timezone_too_many_timezones: str = '<TIMEZONE_TOO_MANY_TIMEZONES {num_zones} "{text}">'
     timezone_updated_to: str = '<TIMEZONE_UPDATED_TO {timezone}>'
     timezone_not_found: str = '<TIMEZONE_NOT_FOUND {text}>'
+    button_confirm: str = '<CONFIRM>'

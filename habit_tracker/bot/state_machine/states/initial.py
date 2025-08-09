@@ -9,7 +9,7 @@ from bot.menu import setup_menu
 
 from bot.state_machine.states_interfaces import IState
 from bot.state_machine.states_factory import register_state
-
+from data.schemas.user import LanguageEnum
 
 logger = logging.getLogger(__name__)
 
@@ -63,4 +63,5 @@ class InitState(IState):
 
     async def on_exit(self) -> None:
         await super().on_exit()
-        await setup_menu(self._user_cache.language, bot.bot_instance)
+        language = self._user_cache.language or LanguageEnum.en
+        await setup_menu(language, bot.bot_instance)

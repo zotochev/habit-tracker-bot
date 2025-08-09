@@ -42,9 +42,10 @@ class StateMachine:
             else:
                 new_state = self._create(HabitStates.help_command)
                 await new_state.on_enter()
+            await self._current_state.on_exit()
         else:
-            await self._exit_or_suspend(self._current_state)
             await new_state.on_enter()
+            await self._exit_or_suspend(self._current_state)
 
         self._current_state = new_state
         if isinstance(self._current_state, IImmediateHandle):
