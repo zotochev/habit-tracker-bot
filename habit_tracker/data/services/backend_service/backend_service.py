@@ -160,3 +160,11 @@ class BackendService:
             return
 
         return [HabitNotification(**h) for h in r.body]
+
+    async def health_check(self) -> bool:
+        r: Response = await self._requester.get("v1/health-check")
+
+        if not r.ok():
+            return False
+
+        return True

@@ -60,3 +60,6 @@ class BackendRepository:
 
     async def get_notifications_for_period(self, now: datetime, period: int) -> list[HabitNotification]:
         return await self._service.get_notifications_for_period(now, period)
+
+    async def health_check(self) -> bool:
+        return await self._service.health_check()
