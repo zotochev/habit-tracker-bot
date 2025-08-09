@@ -8,6 +8,7 @@ from .habit import (
     HabitBuffer,
     HabitRepeatType,
     HabitNotification,
+    HabitProgress,
 )
 from .habit_event import (
     HabitEvent,
@@ -37,4 +38,5 @@ __all__ = [
     'HabitStatistics',
     'CommonProgress',
     'HabitRepeatType',
+    'HabitProgress',
 ]

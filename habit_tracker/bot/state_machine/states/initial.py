@@ -46,7 +46,7 @@ class InitState(IState):
         logger.info("language", user.language)
         logger.info("timezone", user.timezone)
 
-        return self._create(HabitStates.help_command)
+        return self._create(HabitStates.end)
 
     @staticmethod
     def __get_user_id(message: Message | CallbackQuery) -> int:

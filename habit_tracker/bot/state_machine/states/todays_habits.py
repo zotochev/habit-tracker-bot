@@ -9,12 +9,26 @@ from core import localizator
 
 from .abstract_habits_list_state import AbstractHabitsListState
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from bot.cache import UserCache
+    from bot.state_machine.states_interfaces import IState
+    from data.schemas import HabitProgress
+    from data.repositories.backend_repository.backend_repository import BackendRepository
 
 logger = logging.getLogger(__name__)
 
 
 @register_state(HabitStates.todays_habits)
 class TodaysHabitsState(AbstractHabitsListState):
+    def __init__(self,
+                 backend_repository: BackendRepository,
+                 user_cache: UserCache,
+                 state_factory: dict[HabitStates, type[IState]],
+                 ) -> None:
+        super().__init__(backend_repository, user_cache, state_factory)
+        self.__has_habits_today = False
 
     async def _process_habit_button_callback(self, callback_query: CallbackQuery) -> None:
         l = localizator.localizator.lang(self._user_cache.language)
@@ -29,7 +43,7 @@ class TodaysHabitsState(AbstractHabitsListState):
     def __is_habit_completed(self, habit_id: int) -> bool:
         for habit in self._habits:
             if habit.id == habit_id:
-                return habit.times_did + 1 == habit.times_per_day
+                return habit.times_did + 1 == habit.times_per_day  # +1 because habit does not updated yet
         return False
 
     def _format_habits_message(self) -> str:
@@ -43,14 +57,20 @@ class TodaysHabitsState(AbstractHabitsListState):
         text += '\n'
 
         if not self._habits:
-            text = f'\n{l.habit_list_no_habits}'
-            return text
+            if not self.__has_habits_today:
+                text = f'\n{l.habit_list_no_habits_today}'
+            elif self.__has_habits_today:
+                text = f'\n{l.habit_list_you_did_all_habits_today}'
+            else:
+                text = '\nUnexpected 🐕'
         return text
 
-    async def _retrieve_habits(self):
-        return await self._backend_repository.get_habits_for_date(
-            self._user_cache.backend_id, self._user_cache.last_datetime.date(), unfinished_only=True
+    async def _retrieve_habits(self) -> list[HabitProgress]:
+        habits = await self._backend_repository.get_habits_for_date(
+            self._user_cache.backend_id, self._user_cache.last_datetime.date(), unfinished_only=False
         )
+        self.__has_habits_today = len(habits) > 0
+        return [h for h in habits if h.times_did < h.times_per_day]
 
     def _construct_keyboard(self):
         keyboard = InlineKeyboardMarkup(inline_keyboard=[])

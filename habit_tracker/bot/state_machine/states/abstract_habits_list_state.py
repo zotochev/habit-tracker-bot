@@ -12,6 +12,7 @@ from bot.state_machine.states_interfaces import ISuspendableState
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from data.schemas import Habit
     from bot.cache import UserCache
     from data.repositories.backend_repository.backend_repository import BackendRepository
 
@@ -97,7 +98,7 @@ class AbstractHabitsListState(IState, ISuspendableState):
         raise NotImplementedError
 
     @abstractmethod
-    async def _retrieve_habits(self):
+    async def _retrieve_habits(self) -> Habit:
         raise NotImplementedError
 
     async def __update(self) -> None:

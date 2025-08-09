@@ -45,6 +45,8 @@ class Translations(BaseModel):
     habit_list_header: str = '<HABIT_LIST_HEADER>'
     habit_list_tagline: str = '<HABIT_LIST_TAGLINE>'
     habit_list_no_habits: str = '<HABIT_LIST_NO_HABITS>'
+    habit_list_no_habits_today: str = '<HABIT_LIST_NO_HABITS_TODAY>'
+    habit_list_you_did_all_habits_today: str = '<HABIT_LIST_YOU_DID_ALL_HABITS_TODAY>'
     habit_list_page: str = '<HABIT_LIST_PAGE>'
     habit_list_congrats: str = '<HABIT_LIST_CONGRATS>'
     my_habits_header: str = '<MY_HABITS_HEADER>'

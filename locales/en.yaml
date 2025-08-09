@@ -17,7 +17,18 @@ menu_choose_timezone: "🕐 Timezone"
 menu_settings: "⚙️ Settings"
 menu_progress: "📈 Your Progress"
 menu_help: '❓ About the bot'
-help_message: 'Here we will describe how to use habit tracker'
+help_message: |
+  Welcome to Habit Tracker! 🎉
+  I’m here to help you build and maintain great habits. In menu you will find the commands you can use to get started:
+
+  ➕ Add habit — Create a new habit you want to build
+  ✅ Today's habits — See the habits you should do today
+  📋 My Habits — View all your habits and their details
+  📈 Your Progress — Track how well you’re doing over time
+  ⚙️ Settings — Customize your bot
+  ❓ About the bot — Show this message anytime
+
+  Start building your best self, one habit at a time! 💪
 unexpected: 'Unexpected input'
 habit_header: 'New Habit'
 habit_field_name: 'Name'
@@ -41,6 +52,8 @@ habit_created: 'Habit Created! 🎉'
 habit_list_header: "Todays' Habits"
 habit_list_tagline: 'Mark completed habits or keep working on them'
 habit_list_no_habits: 'You have no habits'
+habit_list_no_habits_today: '🫙 You don’t have any habits scheduled for today. Take a rest or add new habits to start building your routine!'
+habit_list_you_did_all_habits_today: '✅ Awesome! You’ve completed all your habits for today. Keep up the great work and stay consistent!'
 habit_list_page: 'Page'
 habit_list_congrats: '🎉 Great job! You’ve just completed this habit for today! Keep up the good work 💪'
 my_habits_header: 'My Habits'

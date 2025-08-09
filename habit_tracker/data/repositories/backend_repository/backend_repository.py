@@ -1,6 +1,5 @@
-from datetime import date, time, datetime
+from datetime import date, datetime
 
-from data.schemas.habit_event import HabitStatistics
 from data.services.backend_service.backend_service import BackendService
 from data.schemas import (
     User,
@@ -11,6 +10,8 @@ from data.schemas import (
     CommonProgress,
     UserUpdate,
     HabitNotification,
+    HabitProgress,
+    HabitStatistics,
 )
 
 
@@ -36,7 +37,7 @@ class BackendRepository:
     async def create_habit(self, user_id: int, habit_buffer: HabitBuffer) -> Habit | None:
         return await self._service.create_habit(user_id, habit_buffer)
 
-    async def get_habits_for_date(self, user_id: int, habit_date: date, unfinished_only: bool = False) -> Habit | None:
+    async def get_habits_for_date(self, user_id: int, habit_date: date, unfinished_only: bool = False) -> list[HabitProgress] | None:
         return await self._service.get_habits_for_date(user_id, habit_date, unfinished_only)
 
     async def send_habit_event(self, habit_id: int, timestamp: date) -> HabitEvent:
