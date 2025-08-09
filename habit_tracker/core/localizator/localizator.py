@@ -1,7 +1,3 @@
-from email.policy import default
-from pathlib import Path
-
-from data.schemas import TelegramAccount
 from data.schemas.translations import Translations
 from data.schemas.user import LanguageEnum
 
