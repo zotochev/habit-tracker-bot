@@ -21,3 +21,5 @@ class HabitStates(Enum):
     help_command = auto()
     registration = auto()
     choose_timezone = auto()
+
+    settings = auto()

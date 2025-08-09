@@ -11,3 +11,4 @@ from .help_command import HelpCommand
 from .delete_habit import DeleteState
 from .registration_state import RegistrationState
 from .choose_timezone import ChooseTimezoneState
+from .settings_state import SettingsState

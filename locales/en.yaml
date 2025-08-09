@@ -12,7 +12,9 @@ enter_habit_start_date: "Habit start"
 menu_add_habit: '➕ Add habit'
 menu_list_habits: "✅ Today's habits"
 menu_my_habits: "📋 My Habits"
-menu_choose_language: "🌍 Choose Language"
+menu_choose_language: "🌍 Language"
+menu_choose_timezone: "🕐 Timezone"
+menu_settings: "⚙️ Settings"
 menu_progress: "📈 Your Progress"
 menu_help: '❓ About the bot'
 help_message: 'Here we will describe how to use habit tracker'
