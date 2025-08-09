@@ -35,5 +35,9 @@ if BOT_MODE == BotMode.webhook:
               ):
         assert c is not None
 
+API_ENDPOINT_PORT=os.getenv('API_ENDPOINT_PORT')
+if API_ENDPOINT_PORT:
+    API_ENDPOINT_PORT = int(API_ENDPOINT_PORT)
+
 MAX_HABIT_NAME = 30
 MAX_HABIT_DESCRIPTION = 300
