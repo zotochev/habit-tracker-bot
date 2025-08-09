@@ -3,7 +3,6 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 from bot.cache import UserCache
-
 from bot.menu import MenuCommands
 from bot.states import HabitStates
 
