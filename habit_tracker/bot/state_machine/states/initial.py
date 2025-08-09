@@ -11,6 +11,7 @@ from bot.state_machine.states_interfaces import IState
 from bot.state_machine.states_factory import register_state
 from data.schemas.user import LanguageEnum
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -41,9 +42,9 @@ class InitState(IState):
         self._user_cache.timezone = user.timezone
         self._user_cache.is_inited = True
 
-        print("id", user.id)
-        print("language", user.language)
-        print("timezone", user.timezone)
+        logger.info("id", user.id)
+        logger.info("language", user.language)
+        logger.info("timezone", user.timezone)
 
         return self._create(HabitStates.help_command)
 

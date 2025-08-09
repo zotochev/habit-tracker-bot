@@ -38,7 +38,7 @@ class ChooseTimezoneState(IState):
                  **kwargs,
                  ) -> None:
         super().__init__(backend_repository, user_cache, state_factory, **kwargs)
-        self._current_timezone = ZoneInfo("UTC")
+        self._current_timezone = user_cache.timezone or ZoneInfo("UTC")
         self._found_zones = None
         self._message = None
 
