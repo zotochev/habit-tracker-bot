@@ -1,3 +1,5 @@
+import datetime
+
 from aiogram.dispatcher.middlewares.base import BaseMiddleware
 from aiogram.types import CallbackQuery, Message
 
@@ -12,17 +14,16 @@ class UserStateMiddleware(BaseMiddleware):
 
         if isinstance(event, CallbackQuery):
             user_cache = cache.cache.user(event.message.chat.id)
-            user_cache.last_datetime = event.message.date
 
         elif isinstance(event, Message):
             user_cache = cache.cache.user(event.chat.id)
-            user_cache.last_datetime = event.date
             user_cache.messenger.register_recv_message(event.message_id)
 
         if user_cache is not None:
             if not user_cache.is_inited and (await self.__retrieve_user_data(user_cache.telegram_id)):
                 await cache.cache.setup_user(user_cache.telegram_id)
 
+            user_cache.last_datetime = datetime.datetime.now()
             data["user_cache"] = user_cache
 
         return await handler(event, data)
