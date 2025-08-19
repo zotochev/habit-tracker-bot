@@ -35,6 +35,7 @@ class EditHabitState(AbstractHabitState):
 
     async def on_enter(self) -> None:
         self._habit = await self.__retrieve_habit()
+        self._current_field._habit_buffer = self._habit
         await super().on_enter()
 
     async def _handle_submit(self, callback_query: CallbackQuery):
@@ -47,11 +48,6 @@ class EditHabitState(AbstractHabitState):
 
     def _get_message_header(self) -> str:
         return f"{localizator.localizator.lang(self._user_cache.language).habit_edit_header}: {self._habit.name}\n"
-
-    async def _handle_name(self, habit_name: str) -> str:
-        if habit_name == self._habit.name:
-            return habit_name
-        return await super()._handle_name(habit_name)
 
     async def __update_habit(self):
         await self._backend_repository.update_habit(self._habit)
