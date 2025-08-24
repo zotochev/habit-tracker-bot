@@ -11,6 +11,7 @@ from aiogram.types import InlineKeyboardButton
 from core import localizator
 from data.schemas import HabitBuffer, HabitRepeatType
 from core.timezone_utils import utc_to_local, local_to_utc
+from data.schemas.translations import Translations
 
 from .habit_field_enum import HabitField
 from .exceptions import FieldHandleError
@@ -31,6 +32,7 @@ class FieldStateInputType(Enum):
 
 class IFieldState(ABC):
     field: HabitField
+    next_state: type[IFieldState]
 
     def __init__(
             self,
@@ -38,6 +40,7 @@ class IFieldState(ABC):
             backend_repository: BackendRepository,
             user_cache: UserCache,
     ) -> None:
+        assert self.next_state is not None
         self._habit_buffer = habit_buffer
         self._backend_repository = backend_repository
         self._user_cache = user_cache
@@ -54,9 +57,21 @@ class IFieldState(ABC):
     def keyboard() -> list[list[InlineKeyboardButton]] | None:
         return None
 
+    @staticmethod
+    def translate_name(l: Translations) -> str:
+        raise NotImplementedError
+
+    @staticmethod
+    def translate_value(l: Translations, habit: HabitBuffer, user_cache: UserCache) -> str:
+        raise NotImplementedError
+
 
 class NameFieldState(IFieldState):
     field = HabitField.name
+
+    def __init__(self, habit_buffer: HabitBuffer, backend_repository: BackendRepository, user_cache: UserCache) -> None:
+        self.next_state = DescriptionFieldState
+        super().__init__(habit_buffer, backend_repository, user_cache)
 
     async def handle(self, text: str) -> IFieldState:
         habit_name = text
@@ -65,25 +80,49 @@ class NameFieldState(IFieldState):
             l = localizator.localizator
             raise FieldHandleError(l.lang(self._user_cache.language).habit_error_name_already_in_use)
         self._habit_buffer.name = habit_name
-        return DescriptionFieldState(self._habit_buffer, self._backend_repository, self._user_cache)
+        return self.next_state(self._habit_buffer, self._backend_repository, self._user_cache)
 
     def is_expected_input_type(self, input_type: FieldStateInputType) -> bool:
         return input_type in (FieldStateInputType.message,)
+
+    @staticmethod
+    def translate_name(l: Translations) -> str:
+        return l.habit_field_name
+
+    @staticmethod
+    def translate_value(l: Translations, habit: HabitBuffer, user_cache: UserCache) -> str:
+        return habit.name
 
 
 class DescriptionFieldState(IFieldState):
     field = HabitField.description
 
+    def __init__(self, habit_buffer: HabitBuffer, backend_repository: BackendRepository, user_cache: UserCache) -> None:
+        self.next_state = StartDateFieldState
+        super().__init__(habit_buffer, backend_repository, user_cache)
+
     async def handle(self, text: str) -> IFieldState:
         self._habit_buffer.description = text
-        return TimesPerDayFieldState(self._habit_buffer, self._backend_repository, self._user_cache)
+        return self.next_state(self._habit_buffer, self._backend_repository, self._user_cache)
 
     def is_expected_input_type(self, input_type: FieldStateInputType) -> bool:
         return input_type in (FieldStateInputType.message,)
 
+    @staticmethod
+    def translate_name(l: Translations) -> str:
+        return l.habit_field_description
+
+    @staticmethod
+    def translate_value(l: Translations, habit: HabitBuffer, user_cache: UserCache) -> str:
+        return habit.description
+
 
 class TimesPerDayFieldState(IFieldState):
     field = HabitField.times_per_day
+
+    def __init__(self, habit_buffer: HabitBuffer, backend_repository: BackendRepository, user_cache: UserCache) -> None:
+        self.next_state = None
+        super().__init__(habit_buffer, backend_repository, user_cache)
 
     async def handle(self, text: str) -> IFieldState:
         try:
@@ -91,10 +130,21 @@ class TimesPerDayFieldState(IFieldState):
         except Exception:
             l = localizator.localizator
             raise FieldHandleError(l.lang(self._user_cache.language).habit_error_times)
-        return StartDateFieldState(self._habit_buffer, self._backend_repository, self._user_cache)
+        return self.next_state(self._habit_buffer, self._backend_repository, self._user_cache)
 
     def is_expected_input_type(self, input_type: FieldStateInputType) -> bool:
         return input_type in (FieldStateInputType.message,)
+
+    @staticmethod
+    def translate_name(l: Translations) -> str:
+        return l.habit_field_times_per_day
+
+    @staticmethod
+    def translate_value(l: Translations, habit: HabitBuffer, user_cache: UserCache) -> str:
+        number = 1
+        if habit.notifications:
+            number = len(habit.notifications)
+        return str(number)
 
 
 class DateFieldState(IFieldState):
@@ -104,15 +154,10 @@ class DateFieldState(IFieldState):
         except Exception:
             l = localizator.localizator
             raise FieldHandleError(l.lang(self._user_cache.language).habit_error_date)
-        return self._next_state(self._habit_buffer, self._backend_repository, self._user_cache)
+        return self.next_state(self._habit_buffer, self._backend_repository, self._user_cache)
 
     @abstractmethod
     def _set_field(self, field_date: datetime.date) -> None:
-        ...
-
-    @property
-    @abstractmethod
-    def _next_state(self) -> type[IFieldState]:
         ...
 
     def is_expected_input_type(self, input_type: FieldStateInputType) -> bool:
@@ -122,23 +167,45 @@ class DateFieldState(IFieldState):
 class StartDateFieldState(DateFieldState):
     field = HabitField.start_date
 
+    def __init__(self, habit_buffer: HabitBuffer, backend_repository: BackendRepository, user_cache: UserCache) -> None:
+        self.next_state = EndDateFieldState
+        super().__init__(habit_buffer, backend_repository, user_cache)
+
     def _set_field(self, field_date: datetime.date) -> None:
         self._habit_buffer.start_date = field_date
 
-    @property
-    def _next_state(self) -> type[IFieldState]:
-        return EndDateFieldState
+    @staticmethod
+    def translate_name(l: Translations) -> str:
+        return l.habit_field_start_date
+
+    @staticmethod
+    def translate_value(l: Translations, habit: HabitBuffer, user_cache: UserCache) -> str:
+        date_text = '-'
+        if habit.start_date:
+            date_text = str(habit.start_date)
+        return date_text
 
 
 class EndDateFieldState(DateFieldState):
     field = HabitField.end_date
 
-    @property
-    def _next_state(self) -> type[IFieldState]:
-        return RepeatTypeFieldState
+    def __init__(self, habit_buffer: HabitBuffer, backend_repository: BackendRepository, user_cache: UserCache) -> None:
+        self.next_state = RepeatTypeFieldState
+        super().__init__(habit_buffer, backend_repository, user_cache)
 
     def _set_field(self, field_date: datetime.date) -> None:
         self._habit_buffer.end_date = field_date
+
+    @staticmethod
+    def translate_name(l: Translations) -> str:
+        return l.habit_field_end_date
+
+    @staticmethod
+    def translate_value(l: Translations, habit: HabitBuffer, user_cache: UserCache) -> str:
+        date_text = '-'
+        if habit.end_date:
+            date_text = str(habit.end_date)
+        return date_text
 
 
 class RepeatTypeFieldState(IFieldState):
@@ -155,6 +222,7 @@ class RepeatTypeFieldState(IFieldState):
             backend_repository: BackendRepository,
             user_cache: UserCache,
     ) -> None:
+        self.next_state = NotificationsFieldState
         super().__init__(habit_buffer, backend_repository, user_cache)
         self.__state = self.TYPE_STATE
 
@@ -162,7 +230,7 @@ class RepeatTypeFieldState(IFieldState):
         l = localizator.localizator.lang(self._user_cache.language)
 
         if text == self.SUBMIT_CALLBACK_DATA:
-            return NotificationsFieldState(self._habit_buffer, self._backend_repository, self._user_cache)
+            return self.next_state(self._habit_buffer, self._backend_repository, self._user_cache)
 
         try:
             match self.__state:
@@ -184,7 +252,7 @@ class RepeatTypeFieldState(IFieldState):
             logger.error(f"{self.__class__.__name__}.handle({text}) -> {e.__class__.__name__}: {e}")
             raise FieldHandleError(l.habit_repeat_invalid_input)
 
-        return NotificationsFieldState(self._habit_buffer, self._backend_repository, self._user_cache)
+        return self.next_state(self._habit_buffer, self._backend_repository, self._user_cache)
 
     def is_expected_input_type(self, input_type: FieldStateInputType) -> bool:
         return input_type in (FieldStateInputType.callback_query,)
@@ -268,18 +336,38 @@ class RepeatTypeFieldState(IFieldState):
             case _:
                 raise FieldHandleError(f"Unexpected state: {self.__state}")
 
+    @staticmethod
+    def translate_name(l: Translations) -> str:
+        return l.habit_repeat_type
+
+    @staticmethod
+    def translate_value(l: Translations, habit: HabitBuffer, user_cache: UserCache) -> str:
+        repeat_name = '-'
+        match habit.repeat_type:
+            case HabitRepeatType.daily:
+                repeat_name = l.habit_repeat_type_daily
+            case HabitRepeatType.weekly:
+                repeat_name = l.habit_repeat_type_weekly
+            case HabitRepeatType.monthly:
+                repeat_name = l.habit_repeat_type_monthly
+        return repeat_name
+
 
 class NotificationsFieldState(IFieldState):
     field = HabitField.notifications
     SUBMIT_CALLBACK_DATA = 'NOTIFICATION_FIELD_STATE_SUBMIT'
     DELETE_PREFIX = 'delete'
 
+    def __init__(self, habit_buffer: HabitBuffer, backend_repository: BackendRepository, user_cache: UserCache) -> None:
+        self.next_state = NameFieldState
+        super().__init__(habit_buffer, backend_repository, user_cache)
+
     async def handle(self, text: str) -> IFieldState:
         if self._habit_buffer.notifications is None:
             self._habit_buffer.notifications = []
 
         if text == self.SUBMIT_CALLBACK_DATA:
-            return NameFieldState(self._habit_buffer, self._backend_repository, self._user_cache)
+            return self.next_state(self._habit_buffer, self._backend_repository, self._user_cache)
 
         try:
             to_delete = False
@@ -331,16 +419,23 @@ class NotificationsFieldState(IFieldState):
         )
         return keyboard
 
+    @staticmethod
+    def translate_name(l: Translations) -> str:
+        return l.habit_field_notifications
 
-field_states_factory = {
-    s.field: s
-    for s in (
-        NameFieldState,
-        DescriptionFieldState,
-        TimesPerDayFieldState,
-        StartDateFieldState,
-        EndDateFieldState,
-        RepeatTypeFieldState,
-        NotificationsFieldState,
-    )
-}
+    @staticmethod
+    def translate_value(l: Translations, habit: HabitBuffer, user_cache: UserCache) -> str:
+        if not habit.notifications:
+            return '-'
+        return ", ".join(utc_to_local(t, user_cache.timezone).strftime("%H:%M") for t in habit.notifications)
+
+
+field_states_order = (
+    NameFieldState,
+    DescriptionFieldState,
+    StartDateFieldState,
+    EndDateFieldState,
+    RepeatTypeFieldState,
+    NotificationsFieldState,
+)
+field_states_factory = {s.field: s for s in field_states_order}

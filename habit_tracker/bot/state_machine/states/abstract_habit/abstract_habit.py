@@ -19,8 +19,9 @@ from .abstract_habit_field_states import IFieldState
 from .exceptions import FieldHandleError
 from .abstract_habit_field_states import (
     NameFieldState,
-    field_states_factory,
     FieldStateInputType,
+    field_states_factory,
+    field_states_order,
 )
 
 from typing import TYPE_CHECKING, Any
@@ -137,41 +138,16 @@ class AbstractHabitState(IState, ISuspendableState):
 
     def __create_habit_message(self):
         l = localizator.localizator.lang(self._user_cache.language)
-        translations = {
-            HabitField.name: l.habit_field_name,
-            HabitField.description: l.habit_field_description,
-            HabitField.times_per_day: l.habit_field_times_per_day,
-            HabitField.start_date: l.habit_field_start_date,
-            HabitField.end_date: l.habit_field_end_date,
-            HabitField.repeat_type: l.habit_repeat_type,
-            HabitField.notifications: l.habit_field_notifications,
-
-            HabitRepeatType.daily: l.habit_repeat_type_daily,
-            HabitRepeatType.weekly: l.habit_repeat_type_weekly,
-            HabitRepeatType.monthly: l.habit_repeat_type_monthly,
-
-            self.HABIT_BUTTON_SUBMIT: self._get_submit_button_text(),
-        }
-
-        def translate_value(key: HabitField, value: Any) -> Any:
-            if key == HabitField.repeat_type:
-                return translations[value]
-            elif key == HabitField.notifications:
-                if value:
-                    return ", ".join(utc_to_local(t, self._user_cache.timezone).strftime("%H:%M") for t in value)
-                else:
-                    '-'
-            return value
 
         text = self._get_message_header()
 
         text += "\n".join(
             "{}{}: {}".format(
-                '▶️ ' if h == self._current_field.field else '',
-                translations[h],
-                translate_value(h, getattr(self._habit, h)) if getattr(self._habit, h, None) else '-'
+                '▶️ ' if s == self._current_field.field else '',
+                s.translate_name(l),
+                s.translate_value(l, self._habit, self._user_cache),
             )
-            for h in field_states_factory
+            for s in field_states_order
         )
         if self.__last_error is not None:
             text += '\n'
@@ -186,17 +162,17 @@ class AbstractHabitState(IState, ISuspendableState):
             reply_markup.inline_keyboard = [
                 [
                     InlineKeyboardButton(
-                        text=translations[habit_field],
-                        callback_data=habit_field,
+                        text=habit_field.translate_name(l),
+                        callback_data=habit_field.field,
                     ),
-                ] for habit_field in field_states_factory
+                ] for habit_field in field_states_order
             ]
 
             if self._is_habit_ready():
                 reply_markup.inline_keyboard.append(
                     [
                         InlineKeyboardButton(
-                            text=translations[self.HABIT_BUTTON_SUBMIT],
+                            text=self._get_submit_button_text(),
                             callback_data=self.HABIT_BUTTON_SUBMIT,
                         ),
                     ]
