@@ -121,7 +121,6 @@ class TimesPerDayFieldState(IFieldState):
     field = HabitField.times_per_day
 
     def __init__(self, habit_buffer: HabitBuffer, backend_repository: BackendRepository, user_cache: UserCache) -> None:
-        self.next_state = None
         super().__init__(habit_buffer, backend_repository, user_cache)
 
     async def handle(self, text: str) -> IFieldState:
@@ -389,6 +388,7 @@ class NotificationsFieldState(IFieldState):
             elif not is_max_number_of_notifications:
                 self._habit_buffer.notifications.append(notification)
 
+            self._habit_buffer.times_per_day = max(1, len(self._habit_buffer.notifications))
             self._habit_buffer.notifications.sort()
         except ValueError as e:
             logger.exception(e)
