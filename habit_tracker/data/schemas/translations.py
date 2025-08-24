@@ -103,3 +103,5 @@ class Translations(BaseModel):
         "<NOVEMBER>",
         "<DECEMBER>",
     ]
+    could_not_deduct_time_from_input: str = "<COULD_NOT_DEDUCT_TIME_FROM_INPUT>"
+    exceeded_max_number_of_notifications: str = "<EXCEEDED_MAX_NUMBER_OF_NOTIFICATIONS>"

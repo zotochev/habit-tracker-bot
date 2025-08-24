@@ -357,12 +357,15 @@ class NotificationsFieldState(IFieldState):
     field = HabitField.notifications
     SUBMIT_CALLBACK_DATA = 'NOTIFICATION_FIELD_STATE_SUBMIT'
     DELETE_PREFIX = 'delete'
+    MAX_NOTIFICATIONS = 10
 
     def __init__(self, habit_buffer: HabitBuffer, backend_repository: BackendRepository, user_cache: UserCache) -> None:
         self.next_state = NameFieldState
         super().__init__(habit_buffer, backend_repository, user_cache)
 
     async def handle(self, text: str) -> IFieldState:
+        l = localizator.localizator.lang(self._user_cache.language)
+
         if self._habit_buffer.notifications is None:
             self._habit_buffer.notifications = []
 
@@ -377,15 +380,22 @@ class NotificationsFieldState(IFieldState):
 
             notification = datetime.time.fromisoformat(text)
             notification = local_to_utc(notification, self._user_cache.timezone)
+            is_max_number_of_notifications = len(self._habit_buffer.notifications) >= self.MAX_NOTIFICATIONS
 
             if to_delete:
                 self._habit_buffer.notifications.remove(notification)
-            else:
+            elif is_max_number_of_notifications:
+                raise FieldHandleError(f"{l.exceeded_max_number_of_notifications}: {self.MAX_NOTIFICATIONS}")
+            elif not is_max_number_of_notifications:
                 self._habit_buffer.notifications.append(notification)
+
             self._habit_buffer.notifications.sort()
+        except ValueError as e:
+            logger.exception(e)
+            raise FieldHandleError(f"{l.could_not_deduct_time_from_input} '{text}'")
         except Exception as e:
             logger.exception(e)
-            raise FieldHandleError(f"Could not deduct time from '{text}'")
+            raise FieldHandleError(f"Unexpected error '{text}'")
 
         return self
 

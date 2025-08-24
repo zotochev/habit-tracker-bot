@@ -112,3 +112,5 @@ months:
  - "октябрь"
  - "ноябрь"
  - "декабрь"
+could_not_deduct_time_from_input: "Не получилось распознать время из строки"
+exceeded_max_number_of_notifications: "Превышено максимальное количество оповещений"
