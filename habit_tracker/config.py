@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from pathlib import Path
 
 import dotenv
@@ -39,3 +40,4 @@ API_ENDPOINT_PORT=int(os.getenv('API_ENDPOINT_PORT'))
 
 MAX_HABIT_NAME = 30
 MAX_HABIT_DESCRIPTION = 300
+SEED = int(datetime.now().timestamp())
