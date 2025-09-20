@@ -12,7 +12,6 @@ class HabitStates(Enum):
 
     command_add_habit = auto()
     add_habit = auto()
-    command_todays_habits = auto()  # todo: remove this unused state
     todays_habits = auto()
     my_habits = auto()
     edit_habit = auto()
