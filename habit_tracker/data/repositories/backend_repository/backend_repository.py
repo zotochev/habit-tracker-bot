@@ -12,6 +12,7 @@ from data.schemas import (
     HabitNotification,
     HabitProgress,
     HabitStatistics,
+    TodayNotification,
 )
 
 
@@ -60,6 +61,9 @@ class BackendRepository:
 
     async def get_notifications_for_period(self, now: datetime, period: int) -> list[HabitNotification]:
         return await self._service.get_notifications_for_period(now, period)
+
+    async def get_todays_notifications(self, user_id: int, today: date) -> list[TodayNotification] | None:
+        return await self._service.get_todays_notifications(user_id, today)
 
     async def health_check(self) -> bool:
         return await self._service.health_check()

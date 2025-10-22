@@ -49,7 +49,7 @@ class HabitBase(BaseModel, HabitRepeatTypeMixin):
     times_per_day: int = Field(default=1, ge=1)
     repeat_type: HabitRepeatType = HabitRepeatType.daily
     days_mask: int = 1
-    notifications: list[time] | None = None
+    # notifications: list[time] | None = None
 
 
 class HabitCreate(HabitBase):
@@ -68,7 +68,7 @@ class HabitUpdate(HabitBase):
     times_per_day: int | None = None
     repeat_type: HabitRepeatType | None = None
     days_mask: int | None = None
-    notifications: list[time] | None = None
+    # notifications: list[time] | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -92,7 +92,7 @@ class HabitBuffer(BaseModel, HabitRepeatTypeMixin):
     times_per_day: Optional[int] = Field(default=1, ge=1)
     repeat_type: HabitRepeatType | None = None
     days_mask: int = 1
-    notifications: list[time] | None = None
+    # notifications: list[time] | None = None
 
     model_config = ConfigDict(validate_assignment=True)
 
@@ -101,6 +101,14 @@ class HabitNotification(BaseModel):
     id: int
     user_id: int
     name: str
-    notifications: list[time]
+    # notifications: list[time]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TodayNotification(BaseModel):
+    habit_id: int
+    notification_id: int | None = None
+    time_in_seconds: int | None = None
 
     model_config = ConfigDict(from_attributes=True)

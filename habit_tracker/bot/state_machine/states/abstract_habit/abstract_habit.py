@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from abc import abstractmethod
 import logging
+import datetime
 
 from pydantic import ValidationError
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 
 from core import localizator
-from core.timezone_utils import utc_to_local
 from data.schemas import HabitBuffer, HabitRepeatType
 
 from bot.states import HabitStates
@@ -48,7 +48,8 @@ class AbstractHabitState(IState, ISuspendableState):
         last_date = user_cache.last_datetime.date() if user_cache.last_datetime else None
         self._habit = HabitBuffer(start_date=last_date)
         self._habit.repeat_type = HabitRepeatType.daily
-        self._current_field: IFieldState = NameFieldState(self._habit, self._backend_repository, self._user_cache)
+        self._notifications: list[datetime.time] = []
+        self._current_field: IFieldState = NameFieldState(self._habit, self._notifications, self._backend_repository, self._user_cache)
         self.__last_error: str | None = None
 
     async def __process_input(self, text: str) -> None:
@@ -87,7 +88,7 @@ class AbstractHabitState(IState, ISuspendableState):
             await self.__process_input(callback_query.data)
             await callback_query.answer()
         elif self._current_field.field != HabitField(callback_query.data):
-            self._current_field = field_states_factory[HabitField(callback_query.data)](self._habit, self._backend_repository, self._user_cache)
+            self._current_field = field_states_factory[HabitField(callback_query.data)](self._habit, self._notifications, self._backend_repository, self._user_cache)
             await self.__update_habit_message()
             await callback_query.answer()
         else:
@@ -145,7 +146,7 @@ class AbstractHabitState(IState, ISuspendableState):
             "{}{}: {}".format(
                 '▶️ ' if s == self._current_field.field else '',
                 s.translate_name(l),
-                s.translate_value(l, self._habit, self._user_cache),
+                s.translate_value(l, self._habit, self._notifications, self._user_cache),
             )
             for s in field_states_order
         )

@@ -15,6 +15,7 @@ from data.schemas import (
     HabitNotification,
     HabitStatistics,
     CommonProgress,
+    TodayNotification,
 )
 from data.schemas.habit import HabitProgress
 
@@ -152,7 +153,7 @@ class BackendService:
 
     async def get_notifications_for_period(self, now: datetime, period: int) -> list[HabitNotification] | None:
         r: Response = await self._requester.get(
-            f"v1/habits/notifications/all",
+            f"v1/notifications/all",
             query=jsonable_encoder({'now': now, 'period': period}),
         )
 
@@ -160,6 +161,17 @@ class BackendService:
             return
 
         return [HabitNotification(**h) for h in r.body]
+
+    async def get_todays_notifications(self, user_id: int, today: date) -> list[TodayNotification] | None:
+        r: Response = await self._requester.get(
+            f"v1/notifications/today",
+            query=jsonable_encoder({'user_id': user_id, 'today': today}),
+        )
+
+        if not r.ok():
+            return
+
+        return [TodayNotification(**n) for n in r.body]
 
     async def health_check(self) -> bool:
         r: Response = await self._requester.get("v1/health-check")
