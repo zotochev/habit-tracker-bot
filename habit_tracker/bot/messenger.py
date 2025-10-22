@@ -47,19 +47,24 @@ class Messenger:
 
             logger.warning(f"{self.__class__.__name__}.remove_temp_messages(mm={self.__main_message_id}): {message_id}")
             try:
-                await bot.bot_instance.delete_message(
-                    self.__telegram_id,
-                    message_id=message_id,
-                )
+                await self.__remove_message(message_id)
             except Exception as e:
                 logger.warning(f"{self.__class__.__name__}.remove_temp_messages: {e.__class__.__name__}: {e}")
 
         self.__recv_messages_ids.clear()
         self.__sent_messages_ids.clear()
+    
+    async def __remove_message(self, message_id) -> None:
+        await bot.bot_instance.delete_message(self.__telegram_id, message_id=message_id)
 
     async def __update_main_message(self, text: str, reply_markup: InlineKeyboardMarkup | None = None) -> None:
         try:
-            await self.__edit_message(text, reply_markup)
+            await self.__remove_message(self.__main_message_id)
+            self.__main_message_id = None
+        except TelegramAPIError as e:
+            logger.warning(f"{self.__class__.__name__}: update_main_message(mm={self.__main_message_id}): {e.__class__.__name__}: {e}")
+        try:
+            await self.send_message(text, reply_markup)
         except TelegramAPIError as e:
             logger.warning(f"{self.__class__.__name__}: update_main_message(mm={self.__main_message_id}): {e.__class__.__name__}: {e}")
 
