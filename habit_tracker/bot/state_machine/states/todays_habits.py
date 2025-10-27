@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-@register_state(HabitStates.todays_habits)
+# @register_state(HabitStates.todays_habits)
 class TodaysHabitsState(AbstractHabitsListState):
     def __init__(self,
                  backend_repository: BackendRepository,

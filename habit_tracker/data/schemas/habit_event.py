@@ -13,7 +13,7 @@ class HabitEventCreate(HabitEventBase):
 
 class HabitEvent(HabitEventBase):
     id: int
-    habit_id: int
+    notification_id: int
     timestamp: datetime
 
     model_config = ConfigDict(from_attributes=True)

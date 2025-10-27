@@ -8,7 +8,8 @@ from bot.states import HabitStates
 from core import localizator
 
 from bot.state_machine.states_factory import register_state
-from data.schemas import HabitUpdate
+from core.utils import time_to_seconds
+from data.schemas import HabitUpdate, Notification, NotificationBase
 from .abstract_habit import AbstractHabitState
 
 from typing import TYPE_CHECKING
@@ -35,6 +36,8 @@ class EditHabitState(AbstractHabitState):
 
     async def on_enter(self) -> None:
         self._habit = await self.__retrieve_habit()
+        notifications = await self._backend_repository.get_habit_notifications(self._habit.id)
+        self._notifications = [n.time() for n in notifications if n.time_in_seconds]
         self._current_field._habit_buffer = self._habit
         await super().on_enter()
 
@@ -50,7 +53,12 @@ class EditHabitState(AbstractHabitState):
         return f"{localizator.localizator.lang(self._user_cache.language).habit_edit_header}: {self._habit.name}\n"
 
     async def __update_habit(self):
-        await self._backend_repository.update_habit(self._habit)
+        await self._backend_repository.update_habit(
+            self._habit,
+            [
+                NotificationBase(time_in_seconds=time_to_seconds(t))
+                for t in self._notifications
+            ])
 
     async def __retrieve_habit(self) -> HabitUpdate:
         return await self._backend_repository.get_habit_by_user_id_and_id(self._user_cache.backend_id, self._habit_id)

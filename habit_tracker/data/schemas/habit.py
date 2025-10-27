@@ -5,6 +5,7 @@ from datetime import date, datetime, time
 from typing import Optional
 
 from config import MAX_HABIT_NAME, MAX_HABIT_DESCRIPTION
+from .notification import NotificationBase
 
 
 class HabitRepeatType(Enum):
@@ -68,12 +69,12 @@ class HabitUpdate(HabitBase):
     times_per_day: int | None = None
     repeat_type: HabitRepeatType | None = None
     days_mask: int | None = None
-    # notifications: list[time] | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class Habit(HabitBase):
+    id: int
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -82,6 +83,10 @@ class Habit(HabitBase):
 class HabitProgress(HabitUpdate):
     user_id: Optional[int] = None
     times_did: Optional[int] = None
+
+
+class HabitUpdateWithNotifications(HabitUpdate):
+    notifications: list[NotificationBase] | None = None
 
 
 class HabitBuffer(BaseModel, HabitRepeatTypeMixin):
@@ -95,20 +100,3 @@ class HabitBuffer(BaseModel, HabitRepeatTypeMixin):
     # notifications: list[time] | None = None
 
     model_config = ConfigDict(validate_assignment=True)
-
-
-class HabitNotification(BaseModel):
-    id: int
-    user_id: int
-    name: str
-    # notifications: list[time]
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class TodayNotification(BaseModel):
-    habit_id: int
-    notification_id: int | None = None
-    time_in_seconds: int | None = None
-
-    model_config = ConfigDict(from_attributes=True)

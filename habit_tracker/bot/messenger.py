@@ -59,7 +59,8 @@ class Messenger:
 
     async def __update_main_message(self, text: str, reply_markup: InlineKeyboardMarkup | None = None) -> None:
         try:
-            await self.__remove_message(self.__main_message_id)
+            if self.__main_message_id is not None:
+                await self.__remove_message(self.__main_message_id)
             self.__main_message_id = None
         except TelegramAPIError as e:
             logger.warning(f"{self.__class__.__name__}: update_main_message(mm={self.__main_message_id}): {e.__class__.__name__}: {e}")

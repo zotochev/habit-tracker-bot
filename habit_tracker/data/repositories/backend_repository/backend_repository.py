@@ -9,10 +9,9 @@ from data.schemas import (
     HabitUpdate,
     CommonProgress,
     UserUpdate,
-    HabitNotification,
     HabitProgress,
     HabitStatistics,
-    TodayNotification,
+    Notification, NotificationBase,
 )
 
 
@@ -41,14 +40,14 @@ class BackendRepository:
     async def get_habits_for_date(self, user_id: int, habit_date: date, unfinished_only: bool = False) -> list[HabitProgress] | None:
         return await self._service.get_habits_for_date(user_id, habit_date, unfinished_only)
 
-    async def send_habit_event(self, habit_id: int, timestamp: date) -> HabitEvent:
-        return await self._service.send_habit_event(habit_id, timestamp)
+    async def send_habit_event(self, notification_id: int, timestamp: datetime) -> HabitEvent:
+        return await self._service.send_habit_event(notification_id, timestamp)
 
-    async def get_habit_by_user_id_and_id(self, user_id: int, habit_id: int) -> HabitUpdate | None:
+    async def get_habit_by_user_id_and_id(self, user_id: int, habit_id: int) -> Habit | None:
         return await self._service.get_habit_by_user_id_and_id(user_id, habit_id)
 
-    async def update_habit(self, habit: HabitUpdate) -> Habit | None:
-        return await self._service.update_habit(habit)
+    async def update_habit(self, habit: HabitUpdate, notifications: list[NotificationBase] | None = None) -> Habit | None:
+        return await self._service.update_habit(habit, notifications)
 
     async def get_habit_statistics(self, user_id: int, habit_id: int, target_date: date) -> HabitStatistics:
         return await self._service.get_habit_statistics(user_id, habit_id, target_date)
@@ -59,11 +58,17 @@ class BackendRepository:
     async def delete_habit(self, user_id: int, habit_id: int) -> None:
         return await self._service.delete_habit(user_id, habit_id)
 
-    async def get_notifications_for_period(self, now: datetime, period: int) -> list[HabitNotification]:
+    async def get_notifications_for_period(self, now: datetime, period: int) -> list[Notification]:
         return await self._service.get_notifications_for_period(now, period)
 
-    async def get_todays_notifications(self, user_id: int, today: date) -> list[TodayNotification] | None:
+    async def get_todays_notifications(self, user_id: int, today: date) -> list[Notification] | None:
         return await self._service.get_todays_notifications(user_id, today)
+    
+    async def get_habit_notifications(self, habit_id: int) -> list[Notification] | None:
+        return await self._service.get_habit_notifications(habit_id)
+
+    async def create_notification(self, habit_id: int, time_in_seconds: int | None = None) -> Notification | None:
+        return await self._service.create_notification(habit_id, time_in_seconds)
 
     async def health_check(self) -> bool:
         return await self._service.health_check()

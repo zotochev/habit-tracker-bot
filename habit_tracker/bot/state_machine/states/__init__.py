@@ -4,6 +4,7 @@ from .end_state import EndState
 from .add_habit import AddHabitState
 from .edit_habit import EditHabitState
 from .todays_habits import TodaysHabitsState
+from .todays_notifications import TodaysNotifications
 from .my_habits import MyHabitsState
 from .progress_state import ProgressState
 from .progress_habit_state import ProgressHabitState

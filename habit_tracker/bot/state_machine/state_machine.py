@@ -40,7 +40,7 @@ class StateMachine:
                 await new_state.on_restore()
                 logger.warning(f"{self.__class__.__name__}: handle: restored {new_state.state}")
             else:
-                new_state = self._create(HabitStates.todays_habits)
+                new_state = self._create(HabitStates.todays_notifications)
                 await new_state.on_enter()
             await self._current_state.on_exit()
         else:

@@ -7,9 +7,7 @@ from .habit import (
     HabitUpdate,
     HabitBuffer,
     HabitRepeatType,
-    HabitNotification,
     HabitProgress,
-    TodayNotification,
 )
 from .habit_event import (
     HabitEvent,
@@ -18,6 +16,7 @@ from .habit_event import (
     HabitStatistics,
     CommonProgress,
 )
+from .notification import Notification, NotificationCreate, NotificationBase
 
 
 __all__ = [
@@ -32,7 +31,6 @@ __all__ = [
     'HabitCreate',
     'HabitUpdate',
     'HabitBuffer',
-    'HabitNotification',
     'HabitEvent',
     'HabitEventCreate',
     'HabitEventBase',
@@ -40,5 +38,7 @@ __all__ = [
     'CommonProgress',
     'HabitRepeatType',
     'HabitProgress',
-    'TodayNotification',
+    'Notification',
+    'NotificationCreate',
+    'NotificationBase',
 ]

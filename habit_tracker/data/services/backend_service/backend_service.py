@@ -12,12 +12,12 @@ from data.schemas import (
     HabitCreate,
     HabitEvent,
     HabitUpdate,
-    HabitNotification,
     HabitStatistics,
     CommonProgress,
-    TodayNotification,
+    Notification,
+    NotificationCreate, NotificationBase,
 )
-from data.schemas.habit import HabitProgress
+from data.schemas.habit import HabitProgress, HabitUpdateWithNotifications
 
 
 class BackendService:
@@ -93,15 +93,18 @@ class BackendService:
 
         return [HabitProgress(**h) for h in r.body]
 
-    async def send_habit_event(self, habit_id: int, timestamp: date) -> HabitEvent | None:
-        r: Response = await self._requester.post(f"v1/habits/{habit_id}/event", body=jsonable_encoder({'timestamp': timestamp}))
+    async def send_habit_event(self, notification_id: int, timestamp: datetime) -> HabitEvent | None:
+        r: Response = await self._requester.post(
+            f"v1/notifications/{notification_id}/event",
+            body=jsonable_encoder({'timestamp': timestamp}),
+        )
 
         if not r.ok():
             return
 
         return HabitEvent(**r.body)
 
-    async def get_habit_by_user_id_and_id(self, user_id: int, habit_id: int) -> HabitUpdate | None:
+    async def get_habit_by_user_id_and_id(self, user_id: int, habit_id: int) -> Habit | None:
         r: Response = await self._requester.get(f"v1/habits/{habit_id}", query={'user_id': user_id})
 
         if not r.ok():
@@ -109,13 +112,20 @@ class BackendService:
 
         return HabitUpdate(**r.body)
 
-    async def update_habit(self, habit: HabitUpdate) -> HabitUpdate | None:
-        r: Response = await self._requester.patch(f"v1/habits/", body=jsonable_encoder(habit.model_dump()))
+    async def update_habit(self, habit: HabitUpdate, notifications: list[NotificationBase] | None = None) -> Habit | None:
+        body = habit.model_dump()
+        if notifications is not None:
+            body['notifications'] = notifications
+    
+        r: Response = await self._requester.patch(
+            f"v1/habits/",
+            body=jsonable_encoder(body)
+        )
 
         if not r.ok():
             return
 
-        return HabitUpdate(**r.body)
+        return Habit(**r.body)
 
     async def get_habit_statistics(self, user_id: int, habit_id: int, target_date: date) -> HabitStatistics | None:
         r: Response = await self._requester.get(
@@ -151,7 +161,7 @@ class BackendService:
 
         return
 
-    async def get_notifications_for_period(self, now: datetime, period: int) -> list[HabitNotification] | None:
+    async def get_notifications_for_period(self, now: datetime, period: int) -> list[Notification] | None:
         r: Response = await self._requester.get(
             f"v1/notifications/all",
             query=jsonable_encoder({'now': now, 'period': period}),
@@ -160,18 +170,40 @@ class BackendService:
         if not r.ok():
             return
 
-        return [HabitNotification(**h) for h in r.body]
+        return [Notification(**h) for h in r.body]
 
-    async def get_todays_notifications(self, user_id: int, today: date) -> list[TodayNotification] | None:
+    async def get_todays_notifications(self, user_id: int, today: date) -> list[Notification] | None:
         r: Response = await self._requester.get(
             f"v1/notifications/today",
-            query=jsonable_encoder({'user_id': user_id, 'today': today}),
+            query=jsonable_encoder({'user_id': user_id, 'today': today.isoformat(), 'unfinished_only': int(True)}),
         )
 
         if not r.ok():
             return
 
-        return [TodayNotification(**n) for n in r.body]
+        return [Notification(**n) for n in r.body]
+    
+    async def get_habit_notifications(self, habit_id: int) -> list[Notification] | None:
+        r: Response = await self._requester.get(
+            f"v1/notifications/habit/{habit_id}",
+        )
+        
+        if not r.ok():
+            return
+        
+        return [Notification(**n) for n in r.body]
+
+    async def create_notification(self, habit_id: int, time_in_seconds: int | None = None) -> Notification | None:
+        body = NotificationCreate(habit_id=habit_id, time_in_seconds=time_in_seconds)
+        r: Response = await self._requester.post(
+            "v1/notifications",
+            body=jsonable_encoder(body.model_dump()),
+        )
+
+        if not r.ok():
+            return
+
+        return Notification(**r.body)
 
     async def health_check(self) -> bool:
         r: Response = await self._requester.get("v1/health-check")
