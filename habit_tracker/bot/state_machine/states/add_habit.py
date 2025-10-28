@@ -10,7 +10,7 @@ from core import localizator
 from bot.state_machine.states_factory import register_state
 
 from .abstract_habit import AbstractHabitState
-from core.utils import time_to_seconds
+from core.utils import time_to_seconds, timezone_offset
 
 
 logger = logging.getLogger(__name__)
@@ -25,7 +25,8 @@ class AddHabitState(AbstractHabitState):
             if not self._notifications:
                 await self._backend_repository.create_notification(habit.id, None)
             for notification in self._notifications:
-                await self._backend_repository.create_notification(habit.id, time_to_seconds(notification))
+                seconds = time_to_seconds(notification) + int(timezone_offset(self._user_cache.timezone).total_seconds())
+                await self._backend_repository.create_notification(habit.id, seconds)
         await callback_query.answer(l.habit_created)
 
     def _get_message_header(self) -> str:

@@ -89,7 +89,9 @@ class TodaysNotifications(IState):
             habit = self._habits[n.habit_id]
 
             if n.time_in_seconds:
-                n_time = f'{n.time().hour:02}:{n.time().minute:02}' if n.time_in_seconds else '-'
+                t = n.time(self._user_cache.timezone)
+                print(t, n.time('utc'), self._user_cache.timezone)
+                n_time = f'{t.hour:02}:{t.minute:02}' if n.time_in_seconds else '-'
                 text = f'{n_time}: {habit.name}'
             else:
                 text = f'{habit.name}'

@@ -37,7 +37,7 @@ class EditHabitState(AbstractHabitState):
     async def on_enter(self) -> None:
         self._habit = await self.__retrieve_habit()
         notifications = await self._backend_repository.get_habit_notifications(self._habit.id)
-        self._notifications = [n.time() for n in notifications if n.time_in_seconds]
+        self._notifications = [n.time(self._user_cache.timezone) for n in notifications if n.time_in_seconds]
         self._current_field._habit_buffer = self._habit
         await super().on_enter()
 

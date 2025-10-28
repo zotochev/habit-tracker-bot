@@ -50,7 +50,6 @@ class HabitBase(BaseModel, HabitRepeatTypeMixin):
     times_per_day: int = Field(default=1, ge=1)
     repeat_type: HabitRepeatType = HabitRepeatType.daily
     days_mask: int = 1
-    # notifications: list[time] | None = None
 
 
 class HabitCreate(HabitBase):
@@ -97,6 +96,5 @@ class HabitBuffer(BaseModel, HabitRepeatTypeMixin):
     times_per_day: Optional[int] = Field(default=1, ge=1)
     repeat_type: HabitRepeatType | None = None
     days_mask: int = 1
-    # notifications: list[time] | None = None
 
     model_config = ConfigDict(validate_assignment=True)

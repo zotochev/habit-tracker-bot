@@ -1,4 +1,5 @@
 import datetime
+from zoneinfo import ZoneInfo
 
 
 def seconds_to_time(seconds: int) -> datetime.time:
@@ -15,3 +16,7 @@ def time_to_seconds(time: datetime.time) -> int:
 
 def datetime_to_seconds(dt: datetime.datetime) -> int:
     return time_to_seconds(dt.time())
+
+
+def timezone_offset(tz_name: str) -> datetime.timedelta:
+    return datetime.datetime.now(ZoneInfo(tz_name)).utcoffset()
