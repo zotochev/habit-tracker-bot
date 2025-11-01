@@ -37,7 +37,7 @@ class EditHabitState(AbstractHabitState):
     async def on_enter(self) -> None:
         self._habit = await self.__retrieve_habit()
         notifications = await self._backend_repository.get_habit_notifications(self._habit.id)
-        self._notifications = [n.time(self._user_cache.timezone) for n in notifications if n.time_in_seconds]
+        self._notifications = [n.time("UTC") for n in notifications if n.time_in_seconds]
         self._current_field._habit_buffer = self._habit
         await super().on_enter()
 
@@ -53,6 +53,7 @@ class EditHabitState(AbstractHabitState):
         return f"{localizator.localizator.lang(self._user_cache.language).habit_edit_header}: {self._habit.name}\n"
 
     async def __update_habit(self):
+        # logger.error(f"UPDATING: {self._notifications}")
         await self._backend_repository.update_habit(
             self._habit,
             [

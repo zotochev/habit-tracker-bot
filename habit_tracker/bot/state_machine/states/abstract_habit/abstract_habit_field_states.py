@@ -438,13 +438,13 @@ class NotificationsFieldState(IFieldState):
 
         if self._notifications:
             for notification in self._notifications:
-                notification = utc_to_local(notification, self._user_cache.timezone)
+                notification_local = utc_to_local(notification, self._user_cache.timezone)
 
                 keyboard.append(
                     [
                         InlineKeyboardButton(
-                            text=f'🗑 {notification.strftime("%H:%M")}',
-                            callback_data=f'{self.DELETE_PREFIX}{notification}',
+                            text=f'🗑 {notification_local.strftime("%H:%M")}',
+                            callback_data=f'{self.DELETE_PREFIX}{notification_local}',
                         )
                     ]
                 )
